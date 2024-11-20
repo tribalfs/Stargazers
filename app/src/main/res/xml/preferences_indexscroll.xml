@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <dev.oneuiproject.oneui.preference.SwitchBarPreference
+        android:key="enableIndexScroll"/>
+
+
+    <PreferenceCategory
+        android:title="Index scroll options">
+
+        <SwitchPreferenceCompat
+            android:key="indexScrollAutoHide"
+            android:title="Autohide"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="indexScrollTextMode"
+            android:title="Show letters"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory>
+        <dev.oneuiproject.oneui.preference.HorizontalRadioPreference
+            android:dependency="darkModeAuto"
+            android:key="darkMode"
+            android:title="Dark mode settings"
+            app:entries="@array/preferences_darkmode_entries"
+            app:entriesImage="@array/preferences_darkmode_entries_image"
+            app:entryValues="@array/preferences_darkmode_values"
+            app:viewType="image" />
+
+        <SwitchPreferenceCompat
+            android:disableDependentsState="true"
+            android:key="darkModeAuto"
+            android:title="System default" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="IndexScrollView">
+
+        <SeslSwitchPreferenceScreen
+            android:key="enableIndexScroll"
+            android:title="Use IndexScrollView"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Search mode">
+
+        <ListPreference
+            android:title="Search mode 'on back' behavior"
+            android:key="searchModeBackBehavior"
+            android:defaultValue="0"
+            app:entries="@array/preferences_searchmode_entries"
+            app:entryValues="@array/preferences_searchmode_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <DropDownPreference
+            android:key="actionModeSearch"
+            android:title="Search on action mode"
+            android:defaultValue="0"
+            app:entries="@array/preferences_searchoptions_entries"
+            app:entryValues="@array/preferences_searchoptions_values"
+            app:useSimpleSummaryProvider="true" />
+
+
+      <!--  <SwitchPreferenceCompat
+            android:key="separateSearchActivity"
+            android:title="Separate activity"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="filterMode"
+            android:title="Filter mode"
+            android:defaultValue="true" />-->
+
+        <dev.oneuiproject.oneui.preference.ColorPickerPreference
+            android:key="searchColor"
+            android:title="Highlight color"
+            android:summary="Summary"
+            app:showAlphaSlider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory>
+        <Preference
+            android:key="about"
+            android:title="About Stargazers" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="OneUI Project Team">
+        <Preference
+            android:key="yann"
+            android:title="Yanndroid"
+            android:icon="@drawable/about_page_avatar_yann"
+         />
+
+        <Preference
+            android:key="salvo"
+            android:title="Salvo Giangreco"
+            android:icon="@drawable/about_page_avatar_salvo"
+            />
+
+
+        <Preference
+            android:key="tribalfs"
+            android:title="Tribalfs"
+            android:icon="@drawable/about_page_avatar_tribalfs"
+            />
+    </PreferenceCategory>
+
+</PreferenceScreen>

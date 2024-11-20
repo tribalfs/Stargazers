@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name="com.tribalfs.stargazers.app.StargazersApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
+        tools:ignore="UnusedAttribute"
+        android:theme="@style/OneUITheme"
+        >
+
+        <meta-data
+            android:name="SamsungBasicInteraction"
+            android:value="SEP10" />
+
+        <meta-data
+            android:name="com.samsung.android.icon_container.has_icon_container"
+            android:value="true" />
+        <meta-data
+            android:name="com.samsung.android.icon_container.feature_appicon"
+            android:value="ADAPTIVEICON_SHADOW" />
+
+        <meta-data
+            android:name="theming-meta"
+            android:value="meta_stargazers" />
+
+        <meta-data
+            android:name="theming-meta-xml"
+            android:value="@xml/meta_stargazers" />
+
+        <activity
+            android:name="com.tribalfs.stargazers.ui.screens.main.MainActivity"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme.Starting"
+            android:exported="true">
+
+            <meta-data
+                android:name="com.sec.android.app.launcher.icon_theme"
+                android:value="themeColor" />
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+
+            android:name="com.tribalfs.stargazers.ui.screens.profile.ProfileActivity"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" />
+
+        <activity
+            android:name=".ui.screens.about.AboutAppActivity" />
+
+        <activity
+            android:name="com.tribalfs.stargazers.ui.screens.settings.main.MainSettingsActivity"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" />
+
+        <activity
+            android:name="com.tribalfs.stargazers.ui.screens.settings.indexscroll.IndexscrollSettingsActivity"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" />
+
+        <activity
+            android:name="com.tribalfs.stargazers.ui.screens.customabout.CustomAboutActivity"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" />
+
+    </application>
+
+</manifest>

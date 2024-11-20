@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
+        <item name="postSplashScreenTheme">@style/OneUITheme</item>  # Required.
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_icon_animated</item>
+    </style>
+
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="about_page_secondary_text_color">#ff8c8c8c</color>
+
+    <color name="splash_animated_icon_color">#ff8c8c8c</color>
+    <color name="animated_splash_icon_color">#000000</color>
+
+    <color name="transparent_window_bg_color">#3B000000</color>
+</resources>
