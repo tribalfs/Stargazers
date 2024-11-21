@@ -1,9 +1,7 @@
 package com.tribalfs.stargazers.ui.screens.customabout
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -20,10 +18,10 @@ import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.tribalfs.stargazers.BuildConfig
 import com.tribalfs.stargazers.R
 import com.tribalfs.stargazers.databinding.ActivityAboutAppCustomBinding
-import com.tribalfs.stargazers.ui.core.util.isMultiWindowModeCompat
 import com.tribalfs.stargazers.ui.core.util.openApplicationSettings
 import com.tribalfs.stargazers.ui.core.util.openUrl
 import dev.oneuiproject.oneui.ktx.invokeOnBack
+import dev.oneuiproject.oneui.ktx.isInMultiWindowModeCompat
 import dev.oneuiproject.oneui.utils.DeviceLayoutUtil.isPortrait
 import dev.oneuiproject.oneui.utils.internal.ToolbarLayoutUtils
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -135,7 +133,7 @@ class CustomAboutActivity : AppCompatActivity(), View.OnClickListener {
             mBinding.aboutBottomContainer
         )
         if (config.orientation != Configuration.ORIENTATION_LANDSCAPE
-            && !isMultiWindowModeCompat
+            && !isInMultiWindowModeCompat
         ) {
             mBinding.aboutAppBar.apply {
                 seslSetCustomHeightProportion(true, 0.5f)//expanded
@@ -274,7 +272,7 @@ class CustomAboutActivity : AppCompatActivity(), View.OnClickListener {
         callbackIsActiveState.value = (enable
                 ?: (mBinding.aboutAppBar.seslIsCollapsed()
                 && isPortrait(resources.configuration)
-                && !isMultiWindowModeCompat)).also {
+                && !isInMultiWindowModeCompat)).also {
                     Log.d("CustomAboutActivity", "updateCallbackState: $it")
         }
     }
