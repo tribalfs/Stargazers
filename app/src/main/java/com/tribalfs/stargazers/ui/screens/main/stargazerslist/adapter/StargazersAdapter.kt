@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.MarginLayoutParams
-import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
@@ -27,7 +26,7 @@ import com.tribalfs.stargazers.ui.screens.main.stargazerslist.model.StargazersLi
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.model.StargazersListItemUiModel.StargazerItem
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.model.StargazersListItemUiModel.GroupItem
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.model.StargazersListItemUiModel.SeparatorItem
-import dev.oneuiproject.oneui.ktx.getThemeAttributeValue
+import dev.oneuiproject.oneui.widget.SelectableLinearLayout
 
 class StargazersAdapter (
     private val context: Context
@@ -180,24 +179,24 @@ class StargazersAdapter (
         RecyclerView.ViewHolder(itemView) {
 
         var nameView: TextView
-        private var imageView: ImageView? = null
-        private var numberView: TextView? = null
-        private var checkBox: CheckBox? = null
+        private var avatarView: ImageView? = null
+        private var githubView: TextView? = null
+        private var selectableLayout: SelectableLinearLayout? = null
 
         init {
             if (isSeparator) {
                 nameView = itemView as TextView
             } else {
-                checkBox = itemView.findViewById(R.id.contact_item_checkbox)!!
-                nameView = itemView.findViewById(R.id.contact_item_name)
-                imageView = itemView.findViewById(R.id.contact_item_icon)
-                numberView = itemView.findViewById(R.id.contact_item_number)
+                selectableLayout = itemView.findViewById(R.id.selectable_layout)!!
+                nameView = itemView.findViewById(R.id.stargazer_name)
+                avatarView = itemView.findViewById(R.id.stargazer_avatar)
+                githubView = itemView.findViewById(R.id.stargazer_github)
             }
         }
 
         fun bind(itemId: Long, name: String, imageUrl: String?, number: String?){
             if (imageUrl != null) {
-                imageView!!.loadImageFromUrl(imageUrl)
+                avatarView!!.loadImageFromUrl(imageUrl)
             }
             bindDetails(name, number)
             bindActionMode(itemId)
@@ -207,17 +206,17 @@ class StargazersAdapter (
         fun bindDetails(name: String, number: String?){
             nameView.text =  stringHighlight(name, highlightWord)
             number?.let{
-                numberView!!.apply{
+                githubView!!.apply{
                     text = stringHighlight(it, highlightWord)
                     isVisible = true
                 }
-            } ?: run { numberView?.isVisible = false }
+            } ?: run { githubView?.isVisible = false }
         }
 
         fun bindActionMode(itemId: Long){
-            checkBox?.apply {
-                isVisible = isActionMode
-                isChecked = isSelected(itemId)
+            selectableLayout?.apply {
+                isSelectionMode = isActionMode
+                setSelectedAnimate(isSelected(itemId))
             }
         }
     }
