@@ -124,7 +124,7 @@ class ProfileActivity : AppCompatActivity(){
                     title = i.key!!,
                     showTopDivider = added > 0
                 )
-                added += 0
+                added += 1
             }
         }
     }
