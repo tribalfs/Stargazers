@@ -71,10 +71,7 @@ class StargazersRepo (context: Context) {
     }
 
     private suspend fun updateLocalDb(stargazers: List<Stargazer>){
-        database.stargazerDao().apply {
-            clear()
-            insertAll(stargazers)
-        }
+        database.stargazerDao().replaceAll(stargazers)
     }
 
     private suspend fun fetchStargazers(): List<Stargazer>? = withContext(Dispatchers.IO){

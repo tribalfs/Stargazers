@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.tribalfs.stargazers.data.model.Stargazer
 import kotlinx.coroutines.flow.Flow
 
@@ -17,5 +18,11 @@ interface StargazersDao {
 
     @Query("DELETE FROM stargazers")
     suspend fun clear()
+
+    @Transaction
+    suspend fun replaceAll(stargazers: List<Stargazer>){
+        clear()
+        insertAll(stargazers)
+    }
 
 }
