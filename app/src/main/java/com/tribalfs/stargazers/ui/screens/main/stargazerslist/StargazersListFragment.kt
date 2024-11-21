@@ -11,7 +11,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.MenuProvider
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
@@ -66,7 +65,6 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
 
     private var tipPopupShown = false
     private var tipPopup: TipPopup? = null
-    private var indexScrollEnabled = true
     private lateinit var stargazersAdapter: StargazersAdapter
 
     private var _binding: FragmentStargazersListBinding? = null
@@ -210,19 +208,15 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
             launch {
                 stargazersViewModel.stargazerSettingsStateFlow
                     .collectLatest {
-                        if (indexScrollEnabled != it.enableIndexScroll) {
-                            indexScrollEnabled = it.enableIndexScroll
-                            if (it.enableIndexScroll) {
-                                binding.indexscrollView.isVisible = true
-                                binding.stargazersList.seslSetFastScrollerEnabledForApi24(false)
-                            } else {
-                                binding.indexscrollView.isVisible = false
-                                binding.stargazersList.seslSetFastScrollerEnabledForApi24(true)
-                            }
+                        if (it.enableIndexScroll) {
+                            binding.indexscrollView.isVisible = true
+                            binding.stargazersList.seslSetFastScrollerEnabledForApi24(false)
+                        } else {
+                            binding.indexscrollView.isVisible = false
+                            binding.stargazersList.seslSetFastScrollerEnabledForApi24(true)
                         }
                         binding.indexscrollView.setAutoHide(it.autoHideIndexScroll)
                         stargazersAdapter.searchHighlightColor = it.searchHighlightColor
-
                     }
             }
         }
