@@ -11,10 +11,4 @@
         app:iconTint="?actionMenuTextColor"
         app:showAsAction="always" />
 
-    <item
-        android:id="@+id/menu_contacts_am_delete"
-        android:title="Delete"
-        android:icon="@drawable/ic_oui_delete"
-        app:iconTint="?actionMenuTextColor"
-        app:showAsAction="always" />
 </menu>
