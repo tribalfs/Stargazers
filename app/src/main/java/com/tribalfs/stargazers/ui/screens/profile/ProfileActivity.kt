@@ -64,14 +64,7 @@ class ProfileActivity : AppCompatActivity(){
         super.onStart()
         ActivityBackAnimationDelegate.init(this, mBinding.root).apply{
             onBackInvoked = {
-                mBinding.toolbarLayout.toolbar.let {tb ->
-                    tb.animate().apply {
-                        alpha(0f)
-                        setDuration(50)
-                        doOnEnd { tb.visibility = View.GONE }
-                        start()
-                    }
-                }
+                mBinding.toolbarLayout.toolbar.alpha = 0f
                 mBinding.bottomNav.alpha = 0f
             }
         }
