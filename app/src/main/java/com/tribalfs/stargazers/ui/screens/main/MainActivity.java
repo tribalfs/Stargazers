@@ -138,7 +138,4 @@ public class MainActivity extends AppCompatActivity
         return mBinding.drawerLayout;
     }
 
-    public ScrollAwareFloatingActionButton getFab(){
-        return mBinding.fab;
-    }
 }

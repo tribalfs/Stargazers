@@ -110,13 +110,11 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                 onAllSelectorStateChanged = { stargazersViewModel.allSelectorStateFlow.value = it }
             )
 
-            val fab = (requireActivity() as MainActivity).fab.also {
-                it.hideOnScroll(this@rv)
-            }
+            binding.fab.hideOnScroll(this@rv)
 
             binding.indexscrollView.apply {
                 attachToRecyclerView(this@rv)
-                attachScrollAwareFAB(fab)
+                attachScrollAwareFAB(binding.fab)
             }
         }
 
@@ -126,7 +124,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
     }
 
     private fun setupFabClickListener() {
-        (requireActivity() as MainActivity).fab.apply {
+        binding.fab.apply {
             setOnClickListener {
                 Snackbar.make(
                     it,
@@ -292,7 +290,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
 
     private fun launchActionMode(initialSelected: Array<Long>? = null) {
         with (requireActivity() as MainActivity) {
-            fab.temporaryHide = true
+            binding.fab.isVisible = false
             drawerLayout.startActionMode(
                 onInflateMenu = { menu ->
                     stargazersAdapter.onToggleActionMode(true, initialSelected)
@@ -300,18 +298,12 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                 },
                 onEnd = {
                     stargazersAdapter.onToggleActionMode(false)
-                    fab.temporaryHide = false
+                    binding.fab.isVisible = !drawerLayout.isSearchMode
                 },
                 onSelectMenuItem = {
                     when (it.itemId) {
                         R.id.menu_contacts_am_share -> {
-                            requireActivity().toast("Share!")
-                            drawerLayout.endActionMode()
-                            true
-                        }
-
-                        R.id.menu_contacts_am_delete -> {
-                            requireActivity().toast("Delete!")
+                            requireActivity().toast("Todo(Share!)")
                             drawerLayout.endActionMode()
                             true
                         }
@@ -369,8 +361,12 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
             },
             onStart = {
                 searchView.queryHint = "Search contact"
+                binding.fab.isVisible = false
             },
-            onEnd = { stargazersViewModel.setQuery("") }
+            onEnd = {
+                stargazersViewModel.setQuery("")
+                binding.fab.isVisible = !isActionMode
+            }
         )
     }
 
@@ -427,13 +423,8 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
     override fun onHiddenChanged(hidden: Boolean) {
         if (!hidden) {
             showFragmentMenu(true)
-            (requireActivity() as MainActivity).fab.apply {
-                isVisible = true
-                show()
-            }
         } else {
             showFragmentMenu(false)
-            (requireActivity() as MainActivity).fab.isVisible = false
         }
     }
 

@@ -90,6 +90,17 @@
             android:layout_marginBottom="50dp"
             android:layout_height="wrap_content"/>
 
+        <dev.oneuiproject.oneui.widget.ScrollAwareFloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="28dp"
+            android:src="@drawable/ic_oui_star_outline"
+            app:layout_behavior="@null"
+            />
+
     </dev.oneuiproject.oneui.widget.RoundFrameLayout>
+
 
 </LinearLayout>

@@ -14,16 +14,6 @@
         android:layout_height="match_parent"
         app:layout_location="main_content" >
 
-        <!--Note: You're here (instead in ROOT) to automatically adopt side margin.
-        But `appbar_scrolling_view_behavior` will push you out of the view. -->
-        <dev.oneuiproject.oneui.widget.ScrollAwareFloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="28dp"
-            android:src="@drawable/ic_oui_star_outline"
-           />
     </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
