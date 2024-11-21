@@ -110,9 +110,13 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                 onAllSelectorStateChanged = { stargazersViewModel.allSelectorStateFlow.value = it }
             )
 
+            val fab = (requireActivity() as MainActivity).fab.also {
+                it.hideOnScroll(this@rv)
+            }
+
             binding.indexscrollView.apply {
                 attachToRecyclerView(this@rv)
-                attachScrollAwareFAB((requireActivity() as MainActivity).fab)
+                attachScrollAwareFAB(fab)
             }
         }
 
