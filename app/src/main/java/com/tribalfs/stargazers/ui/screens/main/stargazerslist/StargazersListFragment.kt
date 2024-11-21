@@ -242,22 +242,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
             }else {
                 when(stargazer){
                     is StargazersListItemUiModel.StargazerItem -> {
-                        suspendItemRipple(itemView)
-                        val transitionName = stargazer.stargazer.id.toString()
-                        val options = ActivityOptions.makeSceneTransitionAnimation(
-                            requireActivity(),
-                            itemView,
-                            transitionName
-                        )
-                        requireActivity().startActivity(
-                            Intent(
-                                requireActivity(),
-                                ProfileActivity::class.java
-                            ).apply {
-                                putExtra(KEY_STARGAZER, stargazer.stargazer)
-                                putExtra(KEY_TRANSITION_NAME, transitionName)
-                            }, options.toBundle()
-                        )
+                        openProfileActivity(itemView, stargazer)
                     }
                     is StargazersListItemUiModel.GroupItem -> {
                         toast("${stargazer.groupName} clicked!")
@@ -405,6 +390,28 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                 }, 300)
             }
         }
+    }
+
+    private fun openProfileActivity(
+        itemView: View,
+        stargazer: StargazersListItemUiModel.StargazerItem
+    ) {
+        suspendItemRipple(itemView)
+        val transitionName = stargazer.stargazer.id.toString()
+        val options = ActivityOptions.makeSceneTransitionAnimation(
+            requireActivity(),
+            itemView,
+            transitionName
+        )
+        requireActivity().startActivity(
+            Intent(
+                requireActivity(),
+                ProfileActivity::class.java
+            ).apply {
+                putExtra(KEY_STARGAZER, stargazer.stargazer)
+                putExtra(KEY_TRANSITION_NAME, transitionName)
+            }, options.toBundle()
+        )
     }
 
     // TODO(find a better solution)
