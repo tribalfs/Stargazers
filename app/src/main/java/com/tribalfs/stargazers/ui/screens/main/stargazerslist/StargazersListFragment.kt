@@ -111,6 +111,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                 StargazersAdapter.Payload.SELECTION_MODE,
                 onAllSelectorStateChanged = { stargazersViewModel.allSelectorStateFlow.value = it }
             )
+
             binding.indexscrollView.apply {
                 attachToRecyclerView(this@rv)
                 attachScrollAwareFAB((requireActivity() as MainActivity).fab)
@@ -151,7 +152,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
             }
         }
 
-        requireView().findViewById<AppCompatButton>(R.id.retryBtn).apply {
+        binding.retryBtn.apply {
             setOnClickListener {
                 if (!isOnline(requireContext())) {
                     Snackbar.make(this,  "No internet connection detected.", Snackbar.LENGTH_SHORT).show()
