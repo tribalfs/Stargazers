@@ -67,7 +67,7 @@ class StargazersAdapter (
             }
         })
 
-    var onClickItem: ((StargazersListItemUiModel, Int, View) -> Unit)? = null
+    var onClickItem: ((StargazersListItemUiModel, Int, StargazersAdapter.ViewHolder) -> Unit)? = null
 
     var onLongClickItem: (() -> Unit)? = null
 
@@ -111,11 +111,11 @@ class StargazersAdapter (
                 val view = inflater.inflate(
                     R.layout.view_stargazers_list_item, parent, false
                 )
-                return ViewHolder(view, false).apply {
+                return ViewHolder(view, false).apply vh@{
                     itemView.apply {
                         setOnClickListener {
                             bindingAdapterPosition.let{
-                                onClickItem?.invoke(currentList[it], it, this)
+                                onClickItem?.invoke(currentList[it],it,this@vh)
                             }
                         }
                         setOnLongClickListener {
@@ -179,7 +179,7 @@ class StargazersAdapter (
         RecyclerView.ViewHolder(itemView) {
 
         var nameView: TextView
-        private var avatarView: ImageView? = null
+        var avatarView: ImageView? = null
         private var githubView: TextView? = null
         private var selectableLayout: SelectableLinearLayout? = null
 

@@ -1,6 +1,5 @@
 package com.tribalfs.stargazers.ui.screens.main.stargazerslist
 
-import android.app.ActivityOptions
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -11,6 +10,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair
 import androidx.core.view.MenuProvider
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
@@ -39,6 +40,8 @@ import com.tribalfs.stargazers.ui.screens.main.stargazerslist.model.StargazersLi
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.util.updateIndexer
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_STARGAZER
+import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_TRANSITION_CONTAINER
+import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_TRANSITION_AVATAR
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_TRANSITION_NAME
 import com.tribalfs.stargazers.ui.screens.settings.main.MainSettingsActivity
 import dev.oneuiproject.oneui.delegates.AppBarAwareYTranslator
@@ -234,13 +237,13 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
 
 
     private fun StargazersAdapter.setupOnClickListeners(){
-        onClickItem = { stargazer, position, itemView ->
+        onClickItem = { stargazer, position, vh ->
             if (isActionMode) {
                 onToggleItem(stargazer.toStableId(), position)
             }else {
                 when(stargazer){
                     is StargazersListItemUiModel.StargazerItem -> {
-                        openProfileActivity(itemView, stargazer)
+                        openProfileActivity(vh, stargazer)
                     }
                     is StargazersListItemUiModel.GroupItem -> {
                         toast("${stargazer.groupName} clicked!")
@@ -389,23 +392,30 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
     }
 
     private fun openProfileActivity(
-        itemView: View,
+        vh: StargazersAdapter. ViewHolder,
         stargazer: StargazersListItemUiModel.StargazerItem
     ) {
-        suspendItemRipple(itemView)
+        suspendItemRipple(vh.itemView)
         val transitionName = stargazer.stargazer.id.toString()
-        val options = ActivityOptions.makeSceneTransitionAnimation(
+        val transitionName2 = "${transitionName}1"
+        val transitionName3 =  "${transitionName}2"
+
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
             requireActivity(),
-            itemView,
-            transitionName
+            Pair(vh.itemView, transitionName),
+            Pair(vh.avatarView, transitionName2),
+            Pair(vh.nameView, transitionName3)
         )
+
         requireActivity().startActivity(
             Intent(
                 requireActivity(),
                 ProfileActivity::class.java
             ).apply {
                 putExtra(KEY_STARGAZER, stargazer.stargazer)
-                putExtra(KEY_TRANSITION_NAME, transitionName)
+                putExtra(KEY_TRANSITION_CONTAINER, transitionName)
+                putExtra(KEY_TRANSITION_AVATAR, transitionName2)
+                putExtra(KEY_TRANSITION_NAME, transitionName3)
             }, options.toBundle()
         )
     }

@@ -24,7 +24,6 @@ import com.tribalfs.stargazers.ui.core.util.onSingleClick
 import com.tribalfs.stargazers.ui.core.util.openUrl
 import com.tribalfs.stargazers.ui.core.util.semSetToolTipText
 import com.tribalfs.stargazers.ui.core.util.toast
-import dev.oneuiproject.oneui.ktx.doOnEnd
 import dev.oneuiproject.oneui.widget.CardItemView
 import dev.oneuiproject.oneui.R as designR
 
@@ -34,7 +33,9 @@ class ProfileActivity : AppCompatActivity(){
     companion object{
         private const val TAG = "ProfileActivity"
         const val KEY_STARGAZER = "key_stargazer"
-        const val KEY_TRANSITION_NAME = "key_transition_name"
+        const val KEY_TRANSITION_CONTAINER = "key_transition_name"
+        const val KEY_TRANSITION_AVATAR = "key_transition_name_avatar"
+        const val KEY_TRANSITION_NAME = "key_transition_name_sgname"
     }
 
     private lateinit var mBinding: ActivityStargazerBinding
@@ -43,6 +44,8 @@ class ProfileActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         setupSharedElementTransitionWindow()
         super.onCreate(savedInstanceState)
+        postponeEnterTransition()
+
         mBinding = ActivityStargazerBinding.inflate(layoutInflater)
         setupSharedElementTransitionView()
 
@@ -51,7 +54,6 @@ class ProfileActivity : AppCompatActivity(){
             setNavigationButtonAsBack()
             toolbar.fadeIn()
         }
-
         setContentView(mBinding.root)
 
         initContent()
@@ -153,7 +155,7 @@ class ProfileActivity : AppCompatActivity(){
     private fun setupSharedElementTransitionWindow(){
         window.apply {
             requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
-            //setSharedElementsUseOverlay(false)
+            setSharedElementsUseOverlay(false)
             sharedElementExitTransition = ChangeBounds()
             sharedElementEnterTransition = AutoTransition().apply { duration = 200 }
             sharedElementReturnTransition = AutoTransition().apply { duration = 200 }
@@ -162,12 +164,13 @@ class ProfileActivity : AppCompatActivity(){
     }
 
     private fun setupSharedElementTransitionView(){
-        postponeEnterTransition()
         mBinding.root.apply {
-            doOnPreDraw { startPostponedEnterTransition() }
             isTransitionGroup = true
-            transitionName = intent.getStringExtra(KEY_TRANSITION_NAME)
+            transitionName = intent.getStringExtra(KEY_TRANSITION_CONTAINER)
         }
+        mBinding.stargazerAvatar.doOnPreDraw { startPostponedEnterTransition() }
+        mBinding.stargazerAvatar.transitionName = intent.getStringExtra(KEY_TRANSITION_AVATAR)
+        mBinding.stargazerName.transitionName = intent.getStringExtra(KEY_TRANSITION_NAME)
     }
 
     private fun setupBottomNav(){
