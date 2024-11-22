@@ -95,8 +95,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
-            android:layout_margin="28dp"
+            android:layout_margin="24dp"
             android:src="@drawable/ic_oui_star_outline"
+            app:fabSize="normal"
             app:layout_behavior="@null"
             />
 
