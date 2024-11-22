@@ -48,6 +48,7 @@ import dev.oneuiproject.oneui.delegates.AppBarAwareYTranslator
 import dev.oneuiproject.oneui.delegates.ViewYTranslator
 import dev.oneuiproject.oneui.ktx.clearBadge
 import dev.oneuiproject.oneui.ktx.configureItemSwipeAnimator
+import dev.oneuiproject.oneui.ktx.dpToPx
 import dev.oneuiproject.oneui.ktx.enableCoreSeslFeatures
 import dev.oneuiproject.oneui.ktx.setBadge
 import dev.oneuiproject.oneui.layout.Badge
@@ -116,6 +117,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
             binding.fab.hideOnScroll(this@rv)
 
             binding.indexscrollView.apply {
+                setIndexScrollMargin(0, 78.dpToPx(resources))
                 attachToRecyclerView(this@rv)
                 attachScrollAwareFAB(binding.fab)
             }
