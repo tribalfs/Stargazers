@@ -132,7 +132,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
         binding.fab.apply {
             setOnClickListener {
                 Snackbar.make(
-                    it,
+                    rootView,
                     "STAR any of these repositories: Stargazers, OneUI6 design lib, sesl-androidx and sesl-material",
                     Snackbar.LENGTH_INDEFINITE
                 ).apply {
