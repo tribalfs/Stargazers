@@ -220,7 +220,10 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                             binding.indexscrollView.isVisible = false
                             binding.stargazersList.seslSetFastScrollerEnabledForApi24(true)
                         }
-                        binding.indexscrollView.setAutoHide(it.autoHideIndexScroll)
+                        binding.indexscrollView.apply {
+                            setAutoHide(it.autoHideIndexScroll)
+                            setIndexBarTextMode(it.isTextModeIndexScroll)
+                        }
                         stargazersAdapter.searchHighlightColor = it.searchHighlightColor
                     }
             }
