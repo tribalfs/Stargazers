@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
-        setupSharedElementAnimation();
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
 
@@ -44,12 +43,6 @@ public class MainActivity extends AppCompatActivity
         initDrawer();
         initFragments();
         initOnBackPressed();
-    }
-
-
-    private void setupSharedElementAnimation() {
-        Window window = getWindow();
-        window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
     }
 
     private void initFragmentList() {
