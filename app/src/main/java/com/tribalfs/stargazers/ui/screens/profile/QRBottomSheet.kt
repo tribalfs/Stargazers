@@ -77,7 +77,36 @@ class QRBottomSheet : BottomSheetDialogFragment() {
             })
 
         binding.quickShareBtn.setOnClickListener {
-            toast("Todo(Quick Share)")
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "text/plain"
+            shareIntent.putExtra(Intent.EXTRA_TEXT, stargazer.html_url)
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, stargazer.getDisplayName())
+            shareIntent.putExtra(Intent.EXTRA_TITLE, "Share link")
+
+            val pm = requireContext().packageManager
+            val resInfoList = pm.queryIntentActivities(shareIntent, PackageManager.MATCH_DEFAULT_ONLY)
+
+            var shareAppPackageName = ""
+
+            val quickShareAvailable = resInfoList.any { it.activityInfo.packageName.startsWith("com.google.android.gms") }
+            if (quickShareAvailable) {
+                shareAppPackageName = "com.google.android.gms"
+            } else {
+                val samsungShareAvailable = resInfoList.any { it.activityInfo.packageName == "com.samsung.android.app.sharelive" }
+                if (samsungShareAvailable) {
+                    shareAppPackageName = "com.samsung.android.app.sharelive"
+                } else {
+                    startActivity(Intent.createChooser(shareIntent, "Share via"))
+                }
+            }
+
+            shareIntent.setPackage(shareAppPackageName)
+            try {
+                startActivity(shareIntent)
+            } catch (e: Exception) {
+                startActivity(Intent.createChooser(shareIntent, "Share via"))
+                Log.e("ShareError", "Error launching share intent: ${e.message}")
+            }
         }
 
         binding.saveBtn.setOnClickListener {
