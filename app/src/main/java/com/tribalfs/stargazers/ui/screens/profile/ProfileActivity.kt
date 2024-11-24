@@ -1,10 +1,10 @@
 package com.tribalfs.stargazers.ui.screens.profile
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.transition.AutoTransition
-import android.transition.ChangeBounds
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -15,8 +15,8 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.IntentCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
-import com.tribalfs.stargazers.data.model.Stargazer
 import com.tribalfs.stargazers.R
+import com.tribalfs.stargazers.data.model.Stargazer
 import com.tribalfs.stargazers.databinding.ActivityStargazerBinding
 import com.tribalfs.stargazers.ui.core.util.ActivityBackAnimationDelegate
 import com.tribalfs.stargazers.ui.core.util.loadImageFromUrl
@@ -27,6 +27,8 @@ import com.tribalfs.stargazers.ui.core.util.toast
 import dev.oneuiproject.oneui.widget.CardItemView
 import dev.oneuiproject.oneui.R as designR
 
+//TODO
+// 1. Disable activity transition for large screen (doesn't look good)
 @SuppressLint("RestrictedApi")
 class ProfileActivity : AppCompatActivity(){
 
@@ -50,7 +52,6 @@ class ProfileActivity : AppCompatActivity(){
         setupSharedElementTransitionView()
 
         mBinding.toolbarLayout.apply {
-            setTitle("Stargazer's profile")
             setNavigationButtonAsBack()
             toolbar.fadeIn()
         }
@@ -68,6 +69,7 @@ class ProfileActivity : AppCompatActivity(){
             onBackInvoked = {
                 mBinding.toolbarLayout.toolbar.alpha = 0f
                 mBinding.bottomNav.alpha = 0f
+                mBinding.stargazerDetailsContainer.alpha = 0f
             }
         }
     }
@@ -111,7 +113,14 @@ class ProfileActivity : AppCompatActivity(){
                 }
             }
 
-            val cardDetailsMap = mapOf (
+           setupStargazerDetails()
+        }
+    }
+
+    private fun setupStargazerDetails(){
+        mBinding.stargazerDetailsContainer.alpha = 0f
+        with (stargazer) {
+            val cardDetailsMap = mapOf(
                 location to designR.drawable.ic_oui_location,
                 company to designR.drawable.ic_oui_work,
                 email to designR.drawable.ic_oui_email,
@@ -129,6 +138,7 @@ class ProfileActivity : AppCompatActivity(){
                 added += 1
             }
         }
+        mBinding.stargazerDetailsContainer.fadeIn()
     }
 
     private fun addCardItemView(
@@ -156,28 +166,38 @@ class ProfileActivity : AppCompatActivity(){
         window.apply {
             requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
             setSharedElementsUseOverlay(false)
-            sharedElementExitTransition = ChangeBounds()
-            sharedElementEnterTransition = AutoTransition().apply { duration = 200 }
-            sharedElementReturnTransition = AutoTransition().apply { duration = 200 }
-            sharedElementReenterTransition = ChangeBounds()
+            AutoTransition().let {
+                it.duration = 250
+                sharedElementExitTransition = it
+                sharedElementEnterTransition = it
+                sharedElementReturnTransition = it
+                sharedElementReenterTransition = it
+            }
         }
     }
 
     private fun setupSharedElementTransitionView(){
+        mBinding.stargazerAvatar.transitionName = intent.getStringExtra(KEY_TRANSITION_AVATAR)
+        mBinding.headerContainer.transitionName = intent.getStringExtra(KEY_TRANSITION_CONTAINER)
+        //mBinding.stargazerName.transitionName = intent.getStringExtra(KEY_TRANSITION_NAME)
         mBinding.root.apply {
             isTransitionGroup = true
-            transitionName = intent.getStringExtra(KEY_TRANSITION_CONTAINER)
+            doOnPreDraw { startPostponedEnterTransition() }
         }
-        mBinding.stargazerAvatar.doOnPreDraw { startPostponedEnterTransition() }
-        mBinding.stargazerAvatar.transitionName = intent.getStringExtra(KEY_TRANSITION_AVATAR)
-        mBinding.stargazerName.transitionName = intent.getStringExtra(KEY_TRANSITION_NAME)
     }
 
     private fun setupBottomNav(){
         mBinding.bottomNav.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.menu_sg_share -> {
-                    toast("Todo")
+                    val shareText = "Check out this amazing profile on Stargazers!"
+                    val shareIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, shareText)
+                        type = "text/plain"
+                    }
+                    val chooserIntent = Intent.createChooser(shareIntent, "Share via")
+                    startActivity(chooserIntent)
                     true
                 }
                 R.id.menu_sg_qrcode -> {
@@ -197,5 +217,4 @@ class ProfileActivity : AppCompatActivity(){
             .setStartDelay(150)
             .duration = 250
     }
-
 }
