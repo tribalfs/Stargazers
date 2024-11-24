@@ -40,8 +40,8 @@ import com.tribalfs.stargazers.ui.screens.main.stargazerslist.model.StargazersLi
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.util.updateIndexer
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_STARGAZER
-import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_TRANSITION_CONTAINER
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_TRANSITION_AVATAR
+import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_TRANSITION_CONTAINER
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_TRANSITION_NAME
 import com.tribalfs.stargazers.ui.screens.settings.main.MainSettingsActivity
 import dev.oneuiproject.oneui.delegates.AppBarAwareYTranslator
@@ -130,13 +130,14 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
     private fun setupFabClickListener() {
         binding.fab.apply {
             setOnClickListener {
-                Snackbar.make(
-                    rootView,
-                    "STAR any of these repositories: Stargazers, OneUI6 design lib, sesl-androidx and sesl-material",
-                    Snackbar.LENGTH_INDEFINITE
-                ).apply {
-                    setAction("OK") { requireContext().openUrl("https://github.com/tribalfs/oneui-design") }
-                }.show()
+                tipPopup = TipPopup(it, Mode.TRANSLUCENT).apply {
+                    setMessage("STAR any of these repositories: Stargazers, OneUI6 design lib, sesl-androidx and sesl-material.")
+                    setExpanded(true)
+                    setAction("Ok"){
+                        requireContext().openUrl("https://github.com/tribalfs")
+                    }
+                    show(Direction.TOP_LEFT)
+                }
             }
         }
     }
