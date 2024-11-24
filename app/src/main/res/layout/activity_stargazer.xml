@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:expanded="false"
+    app:expandable="false"
     android:background="?roundedCornerColor">
 
     <androidx.core.widget.NestedScrollView
@@ -20,22 +21,25 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
+            <dev.oneuiproject.oneui.widget.RoundedLinearLayout
                 android:id="@+id/header_container"
-                android:background="@drawable/profile_header_background"
+                android:background="?android:colorBackground"
                 android:padding="8dp"
                 android:orientation="vertical"
                 android:gravity="center_horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:edgeInsetTop="62dp"
+                app:drawOverEdge="false"
+                app:roundedCorners="all">
 
                 <ImageView
+                    android:background="@drawable/avatar_background"
                     android:id="@+id/stargazer_avatar"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_margin="8dp"
                     android:scaleType="fitXY"
-                    android:elevation="12dp"
                     tools:src="@drawable/ic_oui_creatures_outline"/>
 
                 <TextView
@@ -66,13 +70,13 @@
                     layout="@layout/view_stargazer_buttons"
                     android:layout_height="wrap_content" />
 
-            </LinearLayout>
+            </dev.oneuiproject.oneui.widget.RoundedLinearLayout>
 
             <dev.oneuiproject.oneui.widget.Separator
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
-            <dev.oneuiproject.oneui.widget.RoundLinearLayout
+            <dev.oneuiproject.oneui.widget.RoundedLinearLayout
                 android:id="@+id/stargazer_details_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
