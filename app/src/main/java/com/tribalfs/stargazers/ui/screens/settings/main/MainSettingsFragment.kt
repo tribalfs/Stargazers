@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.preference.DropDownPreference
-import androidx.preference.EditTextPreference
-import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SeslSwitchPreferenceScreen
 import androidx.preference.SwitchPreferenceCompat
@@ -29,8 +27,8 @@ import dev.oneuiproject.oneui.ktx.onNewValue
 import dev.oneuiproject.oneui.ktx.onUpdateValue
 import dev.oneuiproject.oneui.ktx.setUpdatableSummaryColor
 import dev.oneuiproject.oneui.ktx.showDotBadge
+import dev.oneuiproject.oneui.preference.ColorPickerPreference
 import dev.oneuiproject.oneui.preference.HorizontalRadioPreference
-import dev.oneuiproject.oneui.preference.TipsCardPreference
 import dev.oneuiproject.oneui.preference.internal.PreferenceRelatedCard
 import dev.oneuiproject.oneui.utils.PreferenceUtils
 
@@ -55,6 +53,7 @@ class MainSettingsFragment : AbsBasePreferencesFragment(){
         super.onResume()
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     private fun initPreferences() {
 
         findPreference<HorizontalRadioPreference>(PREF_DARK_MODE.name)!!.apply {
@@ -86,12 +85,20 @@ class MainSettingsFragment : AbsBasePreferencesFragment(){
             summary = if (isChecked) "Enabled" else "Disabled"
         }
 
-        findPreference<DropDownPreference>(StargazersRepo.PREF_ACTIONMODE_SEARCH.name)!!.apply {
+        findPreference<DropDownPreference>(PREF_ACTIONMODE_SEARCH.name)!!.apply {
             setUpdatableSummaryColor(true)
         }
 
-        findPreference<ListPreference>(StargazersRepo.PREF_SEARCHMODE_BACK_BEHAVIOR.name)!!.apply {
+        findPreference<ColorPickerPreference>(PREF_SEACH_HIGHLIGHT_COLOR.name)!!.apply {
             setUpdatableSummaryColor(true)
+            onNewValue<Int> {
+                summary = "#${it.toHexString()}"
+            }
+            summary = "#${preferenceDataStore!!.getInt(PREF_SEACH_HIGHLIGHT_COLOR.name, 0).toHexString()}"
+        }
+
+        findPreference<Preference>("tribalfs")!!.apply {
+            onClick { requireContext().openUrl("https://github.com/tribalfs") }
         }
 
         findPreference<Preference>("about")!!.apply {

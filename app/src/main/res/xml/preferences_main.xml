@@ -62,7 +62,7 @@
         <dev.oneuiproject.oneui.preference.ColorPickerPreference
             android:key="searchColor"
             android:title="Highlight color"
-            android:summary="Summary"
+            android:defaultValue="#2196F3"
             app:showAlphaSlider="true" />
 
     </PreferenceCategory>
