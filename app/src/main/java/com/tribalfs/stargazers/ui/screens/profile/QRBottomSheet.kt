@@ -59,6 +59,7 @@ class QRBottomSheet : BottomSheetDialogFragment() {
             Stargazer::class.java
         )!!
         binding.sgName.text = stargazer.getDisplayName()
+        binding.noteTv.text = "Scan this QR code on another device to view the ${stargazer.getDisplayName()}'s profile."
 
         Glide.with(this)
             .load(stargazer.avatar_url)
