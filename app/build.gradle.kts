@@ -21,8 +21,8 @@ android {
         minSdk = 23
         targetSdk = 35
 
-        versionCode = 2
-        versionName = "0.0.2"
+        versionCode = 3
+        versionName = "0.0.3"
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -55,8 +55,6 @@ android {
     }
 }
 
-
-
 dependencies {
     //sesl6 modules
     implementation("sesl.androidx.core:core:1.15.0+1.0.11-sesl6+rev0")
@@ -69,7 +67,7 @@ dependencies {
     implementation("sesl.androidx.recyclerview:recyclerview:1.4.0-rc01+1.0.21-sesl6+rev0")
     implementation("sesl.androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01+1.0.0-sesl6+rev0")
     implementation("sesl.androidx.apppickerview:apppickerview:1.0.1+1.0.1-sesl6+rev3")
-    implementation("sesl.androidx.indexscroll:indexscroll:1.0.3+1.0.3-sesl6+rev2")
+    implementation("sesl.androidx.indexscroll:indexscroll:1.0.3+1.0.3-sesl6+rev3")
     implementation("sesl.androidx.viewpager2:viewpager2:1.1.0+1.0.0-sesl6+rev0")
     implementation("sesl.com.google.android.material:material:1.12.0+1.0.23-sesl6+rev1")
 
