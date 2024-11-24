@@ -67,6 +67,7 @@ public class AboutAppActivity extends AppCompatActivity {
             return;
         }
 
+        //TODO (move to data layer for persistence, use work manager)
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             try {

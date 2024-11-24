@@ -23,7 +23,10 @@ import dev.oneuiproject.oneui.layout.setDrawerButtonBadge
 import dev.oneuiproject.oneui.layout.setNavigationBadge
 import kotlinx.coroutines.flow.MutableStateFlow
 
-
+//TODO/s:
+// 1. navigate using navigation lib
+// 2. Add fragments for each repo
+// 3. Allow adding repo in drawer
 class MainActivity : AppCompatActivity(), DrawerListAdapter.DrawerListener {
     private var mBinding: ActivityMainBinding? = null
     private var mFragmentManager: FragmentManager? = null

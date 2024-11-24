@@ -10,6 +10,18 @@ import androidx.preference.Preference
 import androidx.preference.SeslSwitchPreferenceScreen
 import androidx.preference.SwitchPreferenceCompat
 import com.tribalfs.stargazers.R
+import com.tribalfs.stargazers.data.DarkMode
+import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_ACTIONMODE_SEARCH
+import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_AUTO_DARK_MODE
+import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_DARK_MODE
+import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_INDEXSCROLL_ENABLE
+import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_SEACH_HIGHLIGHT_COLOR
+import com.tribalfs.stargazers.ui.core.util.DarkModeUtils
+import com.tribalfs.stargazers.ui.core.util.DarkModeUtils.toDarkMode
+import com.tribalfs.stargazers.ui.core.util.openUrl
+import com.tribalfs.stargazers.ui.screens.about.AboutAppActivity
+import com.tribalfs.stargazers.ui.screens.settings.base.AbsBasePreferencesFragment
+import com.tribalfs.stargazers.ui.screens.settings.indexscroll.IndexscrollSettingsActivity
 import dev.oneuiproject.oneui.ktx.clearBadge
 import dev.oneuiproject.oneui.ktx.isLightMode
 import dev.oneuiproject.oneui.ktx.onClick
@@ -21,17 +33,10 @@ import dev.oneuiproject.oneui.preference.HorizontalRadioPreference
 import dev.oneuiproject.oneui.preference.TipsCardPreference
 import dev.oneuiproject.oneui.preference.internal.PreferenceRelatedCard
 import dev.oneuiproject.oneui.utils.PreferenceUtils
-import com.tribalfs.stargazers.data.DarkMode
-import com.tribalfs.stargazers.data.StargazersRepo
-import com.tribalfs.stargazers.ui.screens.about.AboutAppActivity
-import com.tribalfs.stargazers.ui.screens.settings.base.AbsBasePreferencesFragment
-import com.tribalfs.stargazers.ui.core.util.DarkModeUtils
-import com.tribalfs.stargazers.ui.core.util.DarkModeUtils.toDarkMode
-import com.tribalfs.stargazers.ui.core.util.openUrl
-import com.tribalfs.stargazers.ui.core.util.toast
-import com.tribalfs.stargazers.ui.screens.settings.indexscroll.IndexscrollSettingsActivity
-import dev.oneuiproject.oneui.preference.ColorPickerPreference
 
+//TODO:
+// 1. lib:  make onNewValue type safe
+//
 class MainSettingsFragment : AbsBasePreferencesFragment(){
     private var mRelativeLinkCard: PreferenceRelatedCard? = null
 
@@ -52,14 +57,14 @@ class MainSettingsFragment : AbsBasePreferencesFragment(){
 
     private fun initPreferences() {
 
-        findPreference<HorizontalRadioPreference>(StargazersRepo.PREF_DARK_MODE.name)!!.apply {
+        findPreference<HorizontalRadioPreference>(PREF_DARK_MODE.name)!!.apply {
             setDividerEnabled(false)
             setTouchEffectEnabled(false)
             value = if (requireContext().isLightMode()) "0" else "1"
             onNewValue<String> { DarkModeUtils.darkMode =   it.toDarkMode() }
         }
 
-        findPreference<SwitchPreferenceCompat>(StargazersRepo.PREF_AUTO_DARK_MODE.name)!!.apply {
+        findPreference<SwitchPreferenceCompat>(PREF_AUTO_DARK_MODE.name)!!.apply {
             onUpdateValue<Boolean> {
                 if (it) DarkModeUtils.darkMode = DarkMode.AUTO
                 true
@@ -67,7 +72,7 @@ class MainSettingsFragment : AbsBasePreferencesFragment(){
             isChecked = DarkModeUtils.darkMode == DarkMode.AUTO
         }
 
-        findPreference<SeslSwitchPreferenceScreen>(StargazersRepo.PREF_INDEXSCROLL_ENABLE.name)!!.apply {
+        findPreference<SeslSwitchPreferenceScreen>(PREF_INDEXSCROLL_ENABLE.name)!!.apply {
             setUpdatableSummaryColor(true)
             onNewValue<Boolean> {
                 summary = if (it) "Enabled" else "Disabled"
