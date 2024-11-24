@@ -144,7 +144,7 @@ class StargazersAdapter (
             val item = currentList[position]
             for (payload in payloads.toSet()) {
                 when(payload){
-                    Payload.SELECTION_MODE -> holder.bindActionMode(getItemId(position))
+                    Payload.SELECTION_MODE -> holder.bindActionModeAnimate(getItemId(position))
                     Payload.HIGHLIGHT -> {
                         when (item){
                             is StargazerItem -> with(item.stargazer){ holder.bindDetails(getDisplayName(), html_url) }
@@ -214,6 +214,13 @@ class StargazersAdapter (
         }
 
         fun bindActionMode(itemId: Long){
+            selectableLayout?.apply {
+                isSelectionMode = isActionMode
+                setSelected(isSelected(itemId))
+            }
+        }
+
+        fun bindActionModeAnimate(itemId: Long){
             selectableLayout?.apply {
                 isSelectionMode = isActionMode
                 setSelectedAnimate(isSelected(itemId))
