@@ -18,7 +18,7 @@ import androidx.core.view.isVisible
 import com.tribalfs.stargazers.R
 import com.tribalfs.stargazers.data.model.Stargazer
 import com.tribalfs.stargazers.databinding.ActivityStargazerBinding
-import com.tribalfs.stargazers.ui.core.util.ActivityBackAnimationDelegate
+import com.tribalfs.stargazers.ui.core.animation.ActivityBackAnimator
 import com.tribalfs.stargazers.ui.core.util.loadImageFromUrl
 import com.tribalfs.stargazers.ui.core.util.onSingleClick
 import com.tribalfs.stargazers.ui.core.util.openUrl
@@ -65,7 +65,7 @@ class ProfileActivity : AppCompatActivity(){
 
     override fun onStart() {
         super.onStart()
-        ActivityBackAnimationDelegate.init(this, mBinding.root).apply{
+        ActivityBackAnimator.init(this, mBinding.root).apply{
             onBackInvoked = {
                 mBinding.toolbarLayout.toolbar.alpha = 0f
                 mBinding.bottomNav.alpha = 0f
@@ -190,7 +190,8 @@ class ProfileActivity : AppCompatActivity(){
         mBinding.bottomNav.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.menu_sg_share -> {
-                    val shareText = "Check out this amazing profile on Stargazers!"
+                    val shareText = "Check out this amazing stargazer's profile:" +
+                            "\n${stargazer.html_url}"
                     val shareIntent = Intent().apply {
                         action = Intent.ACTION_SEND
                         putExtra(Intent.EXTRA_TEXT, shareText)

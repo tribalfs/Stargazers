@@ -2,13 +2,17 @@ package com.tribalfs.stargazers.data.model
 
 import android.os.Parcelable
 import androidx.annotation.Keep
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.tribalfs.stargazers.data.local.util.Converters
 import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
 @Entity(tableName = "stargazers")
+@TypeConverters(Converters::class)
 data class Stargazer(
     @PrimaryKey
     val login: String,
@@ -23,7 +27,9 @@ data class Stargazer(
     val email: String?,
     val twitter_username: String?,
     val blog: String?,
-    val bio: String?
+    val bio: String?,
+    @ColumnInfo(defaultValue = "")
+    val starredRepos: Set<String> = emptySet()
 ): Parcelable {
 
     fun getDisplayName(): String = name ?: login

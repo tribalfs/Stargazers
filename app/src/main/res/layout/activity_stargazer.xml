@@ -61,12 +61,12 @@
                     android:textAlignment="center"
                     tools:text="https://github.com/tribalfs"
                     android:textAppearance="?android:attr/textAppearanceListItemSecondary"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:layout_marginBottom="6dp"/>
 
                 <include
                     android:id="@+id/stargazer_buttons"
                     android:layout_width="wrap_content"
-                    android:layout_marginHorizontal="12dp"
                     layout="@layout/view_stargazer_buttons"
                     android:layout_height="wrap_content" />
 

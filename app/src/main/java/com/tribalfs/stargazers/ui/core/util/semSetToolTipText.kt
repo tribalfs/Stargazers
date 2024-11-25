@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package com.tribalfs.stargazers.ui.core.util
 
 import android.view.View
