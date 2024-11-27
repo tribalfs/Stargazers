@@ -42,7 +42,7 @@
             android:id="@+id/indexscroll_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible" />
+            android:layout_marginBottom="78dp" />
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nsvNoItem"
@@ -50,6 +50,7 @@
             android:layout_height="match_parent"
             android:visibility="gone"
             tools:visibility="visible">
+
             <LinearLayout
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
@@ -87,7 +88,9 @@
             android:id="@+id/loading_pb"
             android:layout_width="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="50dp"
+            android:layout_marginBottom="60dp"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:layout_height="wrap_content"/>
 
         <dev.oneuiproject.oneui.widget.ScrollAwareFloatingActionButton

@@ -14,13 +14,13 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tribalfs.stargazers.data.model.Stargazer
-import com.tribalfs.stargazers.databinding.ActivityStargazerQrBinding
+import com.tribalfs.stargazers.databinding.ViewQrBottomsheetBinding
 import com.tribalfs.stargazers.ui.core.util.toast
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_STARGAZER
 
 class QRBottomSheet : BottomSheetDialogFragment() {
 
-    private  var _binding: ActivityStargazerQrBinding? = null
+    private  var _binding: ViewQrBottomsheetBinding? = null
     private val binding get() = _binding!!
 
     companion object {
@@ -46,7 +46,7 @@ class QRBottomSheet : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = ActivityStargazerQrBinding.inflate(inflater, container, false).also {
+    ): View = ViewQrBottomsheetBinding.inflate(inflater, container, false).also {
         _binding = it
     }.root
 
@@ -77,11 +77,13 @@ class QRBottomSheet : BottomSheetDialogFragment() {
             })
 
         binding.quickShareBtn.setOnClickListener {
-            toast("Todo(Quick Share)")
+            //TODO
+            toast("Todo()")
         }
 
         binding.saveBtn.setOnClickListener {
-            toast("Todo(Save image)")
+            //TODO
+            toast("Todo()")
         }
     }
 

@@ -25,13 +25,14 @@ fun List<StargazersListItemUiModel>.toIndexCharsArray(): Array<String> {
 }
 
 
-fun List<Stargazer>.toFilteredStargazerUiModelList(query: String): List<StargazersListItemUiModel> {
+fun List<Stargazer>.toFilteredStargazerUiModelList(query: String, repoFilter: String): List<StargazersListItemUiModel> {
     val list = mutableListOf<StargazersListItemUiModel>()
 
     var previousChar: String? = null
     for (i in indices) {
         val item = this[i]
-        val showItem = item.getSearchableString().containsTokenOf(query)
+        val showItem = (repoFilter.isEmpty() || item.starredRepos.contains(repoFilter))
+                && item.getSearchableString().containsTokenOf(query)
         if (showItem) {
             val char = item.getDisplayName()[0].toString().run { if (this.isDigitsOnly()) "#" else this.uppercase() }
             if (char != previousChar) {

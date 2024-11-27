@@ -21,8 +21,8 @@ android {
         minSdk = 23
         targetSdk = 35
 
-        versionCode = 3
-        versionName = "0.0.3"
+        versionCode = 4
+        versionName = "0.0.4"
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -69,10 +69,10 @@ dependencies {
     implementation("sesl.androidx.apppickerview:apppickerview:1.0.1+1.0.1-sesl6+rev3")
     implementation("sesl.androidx.indexscroll:indexscroll:1.0.3+1.0.3-sesl6+rev3")
     implementation("sesl.androidx.viewpager2:viewpager2:1.1.0+1.0.0-sesl6+rev0")
-    implementation("sesl.com.google.android.material:material:1.12.0+1.0.23-sesl6+rev1")
+    implementation("sesl.com.google.android.material:material:1.12.0+1.0.23-sesl6+rev2")
 
     //design lib
-    implementation("io.github.tribalfs:oneui-design:0.2.4+oneui6")
+    implementation("io.github.tribalfs:oneui-design:0.2.6+oneui6")
 
     //These are still OneUI4/5 icons.
     //Hopefully someone will update this.
@@ -93,6 +93,9 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
+
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.4")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.4")
 }
 
 configurations.implementation {
@@ -114,3 +117,8 @@ configurations.implementation {
     //Exclude official material components lib
     exclude ("com.google.android.material",  "material")
 }
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+

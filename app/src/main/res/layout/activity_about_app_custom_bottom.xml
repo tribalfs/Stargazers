@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:overScrollMode="always"
     android:fillViewport="true">
 
@@ -27,22 +28,22 @@
                 android:id="@+id/about_bottom_dev_yann"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/about_page_avatar_yann"
                 app:showTopDivider="false"
+                tools:icon="@drawable/ic_oui_creatures_outline"
                 app:title="Yanndroid" />
 
             <dev.oneuiproject.oneui.widget.CardItemView
                 android:id="@+id/about_bottom_dev_mesa"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/about_page_avatar_salvo"
+                tools:icon="@drawable/ic_oui_creatures_outline"
                 app:title="Salvo Giangreco" />
 
             <dev.oneuiproject.oneui.widget.CardItemView
                 android:id="@+id/about_bottom_dev_tribalfs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/about_page_avatar_tribalfs"
+                tools:icon="@drawable/ic_oui_creatures_outline"
                 app:title="Tribalfs"/>
 
         </dev.oneuiproject.oneui.widget.RoundLinearLayout>

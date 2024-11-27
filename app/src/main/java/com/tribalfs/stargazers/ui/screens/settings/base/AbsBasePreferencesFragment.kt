@@ -1,10 +1,12 @@
 package com.tribalfs.stargazers.ui.screens.settings.base
 
 import android.os.Bundle
+import android.view.animation.PathInterpolator
 import androidx.annotation.CallSuper
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.tribalfs.stargazers.data.datastore.PreferenceDataStoreImpl
+import com.google.android.material.transition.MaterialSharedAxis
+import com.tribalfs.stargazers.data.local.datastore.PreferenceDataStoreImpl
 
 abstract class AbsBasePreferencesFragment : PreferenceFragmentCompat(),
     PreferenceDataStoreImpl.OnPreferencesChangeListener {
@@ -26,6 +28,7 @@ abstract class AbsBasePreferencesFragment : PreferenceFragmentCompat(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         PreferenceDataStoreImpl.getInstance(requireContext()).addOnPreferencesChangeListener(this)
+        setupFragmentTransitions()
     }
 
     @CallSuper
@@ -34,4 +37,19 @@ abstract class AbsBasePreferencesFragment : PreferenceFragmentCompat(),
         PreferenceDataStoreImpl.getInstance(requireContext()).removeOnPreferencesChangeListener(this)
     }
 
+    private fun setupFragmentTransitions() {
+        val interpolator = PathInterpolator(0.1f, 0.1f, 0f, 1f)
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
+            this.interpolator = interpolator
+        }
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
+            this.interpolator = interpolator
+        }
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
+            this.interpolator = interpolator
+        }
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
+            this.interpolator = interpolator
+        }
+    }
 }

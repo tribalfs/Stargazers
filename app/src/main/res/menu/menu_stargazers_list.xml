@@ -13,12 +13,12 @@
         app:showAsAction="always" />
 
 
-    <item
+  <!--  <item
         android:id="@+id/menu_sg_settings"
         android:title="Settings"
         app:showAsAction="always"
         android:icon="@drawable/ic_oui_settings_outline"
         app:iconTint="?actionMenuTextColor"
-        />
+        />-->
 
 </menu>

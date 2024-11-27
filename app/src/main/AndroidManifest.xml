@@ -69,17 +69,24 @@
             android:name=".ui.screens.about.AboutAppActivity" />
 
         <activity
-            android:name="com.tribalfs.stargazers.ui.screens.settings.main.MainSettingsActivity"
-            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" />
-
-        <activity
-            android:name="com.tribalfs.stargazers.ui.screens.settings.indexscroll.IndexscrollSettingsActivity"
+            android:name="com.tribalfs.stargazers.ui.screens.settings.SettingsActivity"
             android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" />
 
         <activity
             android:name="com.tribalfs.stargazers.ui.screens.customabout.CustomAboutActivity"
             android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" />
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
+
 
 </manifest>

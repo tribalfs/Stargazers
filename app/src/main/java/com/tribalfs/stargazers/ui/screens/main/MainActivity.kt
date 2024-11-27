@@ -2,131 +2,112 @@ package com.tribalfs.stargazers.ui.screens.main
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import android.util.LayoutDirection
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import com.tribalfs.stargazers.R
+import com.tribalfs.stargazers.data.StargazersRepo
 import com.tribalfs.stargazers.databinding.ActivityMainBinding
-import com.tribalfs.stargazers.ui.core.base.FragmentInfo
-import com.tribalfs.stargazers.ui.core.drawer.DrawerListAdapter
 import com.tribalfs.stargazers.ui.screens.customabout.CustomAboutActivity
-import com.tribalfs.stargazers.ui.screens.main.stargazerslist.StargazersListFragment
-import dev.oneuiproject.oneui.ktx.invokeOnBackPressed
+import com.tribalfs.stargazers.ui.screens.main.core.navigation.AppNavigation
+import com.tribalfs.stargazers.ui.screens.main.core.navigation.MainNavigationDelegate
+import com.tribalfs.stargazers.ui.screens.settings.SettingsActivity
+import dev.oneuiproject.oneui.ktx.setBadge
 import dev.oneuiproject.oneui.layout.Badge
 import dev.oneuiproject.oneui.layout.DrawerLayout
-import dev.oneuiproject.oneui.layout.DrawerLayout.DrawerState
-import dev.oneuiproject.oneui.layout.setButtonBadges
-import dev.oneuiproject.oneui.layout.setDrawerButtonBadge
-import dev.oneuiproject.oneui.layout.setNavigationBadge
-import kotlinx.coroutines.flow.MutableStateFlow
+import dev.oneuiproject.oneui.utils.ActivityUtils
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 //TODO/s:
-// 1. navigate using navigation lib
-// 2. Add fragments for each repo
+// 1. navigate using navigation lib ✔
+// 2. Add fragments for each repo ✔
 // 3. Allow adding repo in drawer
-class MainActivity : AppCompatActivity(), DrawerListAdapter.DrawerListener {
-    private var mBinding: ActivityMainBinding? = null
-    private var mFragmentManager: FragmentManager? = null
-    private val fragments: MutableList<Fragment> = ArrayList()
+class MainActivity : AppCompatActivity(),
+    AppNavigation by MainNavigationDelegate() {
+
+    private lateinit var mBinding: ActivityMainBinding
+    private lateinit var navController: NavController
+
+    private var settingsMenuItem: MenuItem? = null
+
+    private lateinit var mainViewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         mBinding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(mBinding!!.root)
+        setContentView(mBinding.root)
+        mBinding.drawerLayout.setTitle(getString(R.string.app_name))
+        setupNavigation()
 
-        initFragmentList()
-        initDrawer()
-        initFragments()
-        initOnBackPressed()
+        initViewMode()
     }
 
-
-    private fun initFragmentList() {
-        fragments.add(StargazersListFragment())
-    }
-
-    private val callBackState = MutableStateFlow(false)
-
-    private fun initOnBackPressed() {
-        invokeOnBackPressed(callBackState){
-            onDrawerItemSelected(0)
-            (mBinding!!.drawerListView.adapter as DrawerListAdapter).setSelectedItem(0)
-        }
-    }
-
-    private fun initDrawer() {
-        mBinding!!.drawerLayout.setDrawerButtonIcon(
-            getDrawable(dev.oneuiproject.oneui.R.drawable.ic_oui_info_outline))
-        mBinding!!.drawerLayout.setDrawerButtonTooltip("App info")
-        mBinding!!.drawerLayout.setDrawerButtonOnClickListener { v: View? ->
-            startActivity(
-                Intent(
-                    this@MainActivity,
-                    CustomAboutActivity::class.java
-                )
-            )
-            mBinding!!.drawerLayout.setDrawerButtonBadge(Badge.NONE)
-        }
-
-        mBinding!!.drawerListView.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            mBinding!!.drawerListView.adapter =
-                DrawerListAdapter(this@MainActivity, fragments, this@MainActivity)
-            mBinding!!.drawerListView.itemAnimator = null
-            mBinding!!.drawerListView.setHasFixedSize(true)
-            mBinding!!.drawerListView.seslSetLastRoundedCorner(false)
-            mBinding!!.drawerLayout.setButtonBadges(Badge.NONE, Badge.NONE)
-            mBinding!!.drawerLayout.setDrawerStateListener { state: DrawerState ->
-                if (state == DrawerState.OPEN) mBinding!!.drawerLayout.setNavigationBadge(Badge.NONE)
+    private fun setupNavigation() {
+        mBinding.drawerLayout.apply {
+            setDrawerButtonIcon(ResourcesCompat.getDrawable(resources,
+                dev.oneuiproject.oneui.R.drawable.ic_oui_info_outline, theme))
+            setDrawerButtonTooltip("App info")
+            setDrawerButtonOnClickListener {
+                startActivity(Intent(this@MainActivity, CustomAboutActivity::class.java))
             }
         }
 
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_main) as NavHostFragment
+        navController = navHostFragment.navController
+
+        initNavigation(mBinding.drawerLayout, mBinding.drawerListView, navController)
     }
 
-    private fun initFragments() {
-        mFragmentManager = supportFragmentManager
-        val transaction = mFragmentManager!!.beginTransaction()
-        for (fragment in fragments) {
-            if (fragment != null) transaction.add(R.id.main_content, fragment)
-        }
-        transaction.commit()
-        mFragmentManager!!.executePendingTransactions()
-
-        onDrawerItemSelected(0)
+    private fun initViewMode() {
+        val stargazersRepo = StargazersRepo.getInstance(this)
+        val viewModelFactory = MainViewModelFactory(stargazersRepo)
+        mainViewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
     }
 
-    override fun onDrawerItemSelected(position: Int): Boolean {
-        val newFragment = fragments[position]
-        val transaction = mFragmentManager!!.beginTransaction()
-        for (fragment in mFragmentManager!!.fragments) {
-            transaction.hide(fragment)
-        }
-        transaction.show(newFragment).commit()
-
-        if (newFragment is FragmentInfo) {
-            if (!(newFragment as FragmentInfo).isAppBarEnabled) {
-                mBinding!!.drawerLayout.setExpanded(false, false)
-                mBinding!!.drawerLayout.isExpandable = false
-            } else {
-                mBinding!!.drawerLayout.isExpandable = true
-                mBinding!!.drawerLayout.setExpanded(false, false)
-            }
-            mBinding!!.drawerLayout.setTitle((newFragment as FragmentInfo).title)
-            if (newFragment is StargazersListFragment) {
-                mBinding!!.drawerLayout.setExpandedSubtitle("Pull down to refresh")
-            }
-        }
-        mBinding!!.drawerLayout.setDrawerOpen(false, true)
-
-        callBackState.value = position != 0
-
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_main_activity, menu)
+        settingsMenuItem = menu.findItem(R.id.menu_settings)
         return true
     }
 
-    val drawerLayout: DrawerLayout
-        get() = mBinding!!.drawerLayout
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.menu_settings) {
+            ActivityUtils.startPopOverActivity(
+                this,
+                Intent(this, SettingsActivity::class.java),
+                null,
+                ActivityUtils.POP_OVER_POSITION_TOP or
+                        (if (!isRTL) ActivityUtils.POP_OVER_POSITION_RIGHT else ActivityUtils.POP_OVER_POSITION_LEFT)
+            )
+            return true
+        }
+        return false
+    }
+
+    override fun onStart() {
+        super.onStart()
+        lifecycleScope.launch {
+            mainViewModel.stargazerSettingsStateFlow.first().let {
+                settingsMenuItem?.setBadge(if (it) Badge.DOT else Badge.NONE)
+            }
+        }
+    }
+
+    private val isRTL: Boolean get() = resources.configuration.layoutDirection == LayoutDirection.RTL
+
+    val drawerLayout: DrawerLayout get() = mBinding.drawerLayout
+
+    companion object{
+        const val KEY_REPO_NAME = "repoName"
+    }
 }

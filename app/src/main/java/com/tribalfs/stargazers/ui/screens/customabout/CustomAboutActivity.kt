@@ -10,18 +10,22 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.animation.PathInterpolatorCompat
 import androidx.core.view.updateLayoutParams
+import androidx.preference.Preference
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.tribalfs.stargazers.BuildConfig
 import com.tribalfs.stargazers.R
 import com.tribalfs.stargazers.databinding.ActivityAboutAppCustomBinding
+import com.tribalfs.stargazers.ui.core.util.loadImageFromUrl
 import com.tribalfs.stargazers.ui.core.util.openApplicationSettings
 import com.tribalfs.stargazers.ui.core.util.openUrl
 import dev.oneuiproject.oneui.ktx.invokeOnBack
 import dev.oneuiproject.oneui.ktx.isInMultiWindowModeCompat
+import dev.oneuiproject.oneui.ktx.onClick
 import dev.oneuiproject.oneui.utils.DeviceLayoutUtil.isPortrait
 import dev.oneuiproject.oneui.utils.internal.ToolbarLayoutUtils
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -177,6 +181,10 @@ class CustomAboutActivity : AppCompatActivity(), View.OnClickListener {
             aboutBottomRelativeJetpack.setOnClickListener(this@CustomAboutActivity)
             aboutBottomRelativeMaterial.setOnClickListener(this@CustomAboutActivity)
             aboutBottomDevTribalfs.setOnClickListener(this@CustomAboutActivity)
+
+            aboutBottomDevYann.loadImageFromUrl("https://avatars.githubusercontent.com/u/57589186?v=4")
+            aboutBottomDevMesa.loadImageFromUrl("https://avatars.githubusercontent.com/u/13062958?v=4")
+            aboutBottomDevTribalfs.loadImageFromUrl("https://avatars.githubusercontent.com/u/65062033?v=4")
         }
     }
 

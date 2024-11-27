@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <PreferenceCategory>
         <dev.oneuiproject.oneui.preference.HorizontalRadioPreference
@@ -10,21 +11,24 @@
             app:entries="@array/preferences_darkmode_entries"
             app:entriesImage="@array/preferences_darkmode_entries_image"
             app:entryValues="@array/preferences_darkmode_values"
-            app:viewType="image" />
+            app:viewType="image"
+            android:defaultValue="0"
+            />
 
         <SwitchPreferenceCompat
             android:disableDependentsState="true"
             android:key="darkModeAuto"
+            android:defaultValue="true"
             android:title="System default" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="IndexScrollView">
+        android:title="Index scroll">
 
         <SeslSwitchPreferenceScreen
             android:key="enableIndexScroll"
-            android:title="Use IndexScrollView"
+            android:title="Use index scroll"
             android:defaultValue="true" />
 
     </PreferenceCategory>
@@ -78,20 +82,20 @@
         <Preference
             android:key="yann"
             android:title="Yanndroid"
-            android:icon="@drawable/about_page_avatar_yann"
+            tools:icon="@drawable/ic_oui_creatures_outline"
          />
 
         <Preference
             android:key="salvo"
             android:title="Salvo Giangreco"
-            android:icon="@drawable/about_page_avatar_salvo"
+            tools:icon="@drawable/ic_oui_creatures_outline"
             />
 
 
         <Preference
             android:key="tribalfs"
             android:title="Tribalfs"
-            android:icon="@drawable/about_page_avatar_tribalfs"
+            tools:icon="@drawable/ic_oui_creatures_outline"
             />
     </PreferenceCategory>
 

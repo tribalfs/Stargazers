@@ -27,7 +27,6 @@
                 android:id="@+id/about_bottom_dev_yann"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/about_page_avatar_yann"
                 app:showTopDivider="false"
                 app:title="Yanndroid" />
 
@@ -35,14 +34,12 @@
                 android:id="@+id/about_bottom_dev_mesa"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/about_page_avatar_salvo"
                 app:title="Salvo Giangreco" />
 
             <dev.oneuiproject.oneui.widget.CardItemView
                 android:id="@+id/about_bottom_dev_tribalfs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/about_page_avatar_tribalfs"
                 app:title="Tribalfs"/>
 
         </dev.oneuiproject.oneui.widget.RoundLinearLayout>
