@@ -52,6 +52,7 @@ import dev.oneuiproject.oneui.layout.ToolbarLayout
 import dev.oneuiproject.oneui.layout.ToolbarLayout.SearchModeOnBackBehavior
 import dev.oneuiproject.oneui.layout.startActionMode
 import dev.oneuiproject.oneui.layout.startSearchMode
+import dev.oneuiproject.oneui.utils.DeviceLayoutUtil.isTabletLayoutOrDesktop
 import dev.oneuiproject.oneui.utils.ItemDecorRule
 import dev.oneuiproject.oneui.utils.SemItemDecoration
 import dev.oneuiproject.oneui.widget.TipPopup
@@ -420,12 +421,14 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
         val transitionName2 = "${transitionName}1"
         val transitionName3 = "${transitionName}2"
 
-        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-            requireActivity(),
-            Pair(vh.itemView, transitionName),
-            Pair(vh.avatarView, transitionName2),
-            Pair(vh.nameView, transitionName3)
-        )
+        val options = if (!isTabletLayoutOrDesktop(requireContext())) {
+            ActivityOptionsCompat.makeSceneTransitionAnimation(
+                requireActivity(),
+                Pair(vh.itemView, transitionName),
+                Pair(vh.avatarView, transitionName2),
+                Pair(vh.nameView, transitionName3)
+            ).toBundle()
+        } else null
 
         requireActivity().startActivity(
             Intent(
@@ -436,8 +439,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                 putExtra(KEY_TRANSITION_CONTAINER, transitionName)
                 putExtra(KEY_TRANSITION_AVATAR, transitionName2)
                 putExtra(KEY_TRANSITION_NAME, transitionName3)
-            }, options.toBundle()
-        )
+            }, options)
     }
 
     // TODO(find a better solution)

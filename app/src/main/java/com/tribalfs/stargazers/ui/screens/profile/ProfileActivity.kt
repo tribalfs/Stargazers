@@ -25,12 +25,11 @@ import com.tribalfs.stargazers.ui.core.util.onSingleClick
 import com.tribalfs.stargazers.ui.core.util.openUrl
 import com.tribalfs.stargazers.ui.core.util.semSetToolTipText
 import com.tribalfs.stargazers.ui.core.util.toast
+import dev.oneuiproject.oneui.utils.DeviceLayoutUtil.isTabletLayoutOrDesktop
 import dev.oneuiproject.oneui.widget.CardItemView
 import dev.oneuiproject.oneui.R as designR
 
-//TODO
-// 1. Disable activity transition for large screen (doesn't look good)
-@SuppressLint("RestrictedApi")
+
 class ProfileActivity : AppCompatActivity(){
 
     companion object{
@@ -54,7 +53,7 @@ class ProfileActivity : AppCompatActivity(){
 
         mBinding.toolbarLayout.apply {
             setNavigationButtonAsBack()
-            toolbar.fadeIn()
+            toolbar.fadeInIfSupported()
         }
         setContentView(mBinding.root)
 
@@ -66,11 +65,13 @@ class ProfileActivity : AppCompatActivity(){
 
     override fun onStart() {
         super.onStart()
-        ActivityBackAnimator.init(this, mBinding.root).apply{
-            onBackInvoked = {
-                mBinding.toolbarLayout.toolbar.alpha = 0f
-                mBinding.bottomNav.alpha = 0f
-                mBinding.stargazerDetailsContainer.alpha = 0f
+        if (isSupportBackTransition) {
+            ActivityBackAnimator.init(this, mBinding.root).apply {
+                onBackInvoked = {
+                    mBinding.toolbarLayout.toolbar.alpha = 0f
+                    mBinding.bottomNav.alpha = 0f
+                    mBinding.stargazerDetailsContainer.alpha = 0f
+                }
             }
         }
     }
@@ -114,12 +115,12 @@ class ProfileActivity : AppCompatActivity(){
                 }
             }
 
-           setupStargazerDetails()
+            setupStargazerDetails()
         }
     }
 
     private fun setupStargazerDetails(){
-        mBinding.stargazerDetailsContainer.alpha = 0f
+        mBinding.stargazerDetailsContainer.fadeInIfSupported()
         with (stargazer) {
             val cardDetailsMap = mapOf(
                 location to designR.drawable.ic_oui_location,
@@ -139,7 +140,6 @@ class ProfileActivity : AppCompatActivity(){
                 added += 1
             }
         }
-        mBinding.stargazerDetailsContainer.fadeIn()
     }
 
     private fun addCardItemView(
@@ -207,14 +207,17 @@ class ProfileActivity : AppCompatActivity(){
                 else -> false
             }
         }
-        mBinding.bottomNav.fadeIn()
+        mBinding.bottomNav.fadeInIfSupported()
     }
 
-    private fun View.fadeIn() = apply {
+    private fun View.fadeInIfSupported() = apply {
+        if (!isSupportBackTransition) return@apply
         alpha = 0f
         animate()
             .alpha(1f)
             .setStartDelay(150)
             .duration = 250
     }
+
+    private val isSupportBackTransition get() = !isTabletLayoutOrDesktop(this)
 }
