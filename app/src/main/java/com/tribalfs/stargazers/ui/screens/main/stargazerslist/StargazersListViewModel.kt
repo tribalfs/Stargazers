@@ -92,9 +92,11 @@ class StargazersListViewModel (
             _loadStateFlow.value = LoadState.LOADING
         }
 
-        stargazersRepo.refreshStargazers {success ->
-            isFinishRefresh = true
-            _loadStateFlow.value = if (success) LoadState.LOADED else LoadState.ERROR
+        launch {
+            stargazersRepo.refreshStargazers { success ->
+                isFinishRefresh = true
+                _loadStateFlow.value = if (success) LoadState.LOADED else LoadState.ERROR
+            }
         }
 
         if (!isRetryLoad){
