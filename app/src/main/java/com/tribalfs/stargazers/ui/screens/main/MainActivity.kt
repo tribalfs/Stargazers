@@ -8,8 +8,10 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.tribalfs.stargazers.R
@@ -23,7 +25,7 @@ import dev.oneuiproject.oneui.ktx.setBadge
 import dev.oneuiproject.oneui.layout.Badge
 import dev.oneuiproject.oneui.layout.DrawerLayout
 import dev.oneuiproject.oneui.utils.ActivityUtils
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 //TODO/s:
@@ -48,7 +50,15 @@ class MainActivity : AppCompatActivity(),
         mBinding.drawerLayout.setTitle(getString(R.string.app_name))
         setupNavigation()
 
-        initViewMode()
+        initViewModel()
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mainViewModel.stargazerSettingsStateFlow.collectLatest {
+                    settingsMenuItem?.setBadge(if (it) Badge.DOT else Badge.NONE)
+                }
+            }
+        }
     }
 
     private fun setupNavigation() {
@@ -67,7 +77,7 @@ class MainActivity : AppCompatActivity(),
         initNavigation(mBinding.drawerLayout, mBinding.drawerListView, navController)
     }
 
-    private fun initViewMode() {
+    private fun initViewModel() {
         val stargazersRepo = StargazersRepo.getInstance(this)
         val viewModelFactory = MainViewModelFactory(stargazersRepo)
         mainViewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
@@ -92,15 +102,6 @@ class MainActivity : AppCompatActivity(),
             return true
         }
         return false
-    }
-
-    override fun onStart() {
-        super.onStart()
-        lifecycleScope.launch {
-            mainViewModel.stargazerSettingsStateFlow.first().let {
-                settingsMenuItem?.setBadge(if (it) Badge.DOT else Badge.NONE)
-            }
-        }
     }
 
     private val isRTL: Boolean get() = resources.configuration.layoutDirection == LayoutDirection.RTL
