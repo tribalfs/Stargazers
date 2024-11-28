@@ -8,10 +8,11 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.TooltipCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.animation.PathInterpolatorCompat
+import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
@@ -23,12 +24,14 @@ import com.tribalfs.stargazers.ui.core.util.openApplicationSettings
 import com.tribalfs.stargazers.ui.core.util.openUrl
 import dev.oneuiproject.oneui.ktx.invokeOnBack
 import dev.oneuiproject.oneui.ktx.isInMultiWindowModeCompat
+import dev.oneuiproject.oneui.ktx.semSetToolTipText
 import dev.oneuiproject.oneui.utils.DeviceLayoutUtil.isPortrait
 import dev.oneuiproject.oneui.utils.internal.ToolbarLayoutUtils
+import dev.oneuiproject.oneui.widget.CardItemView
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.abs
 
-class CustomAboutActivity : AppCompatActivity(), View.OnClickListener {
+class CustomAboutActivity : AppCompatActivity(){
 
     private lateinit var mBinding: ActivityAboutAppCustomBinding
     private val mAppBarListener = AboutAppBarListener()
@@ -48,6 +51,7 @@ class CustomAboutActivity : AppCompatActivity(), View.OnClickListener {
 
         initContent()
         refreshAppBar(resources.configuration)
+        setupClickListeners()
         initOnBackPressed()
     }
 
@@ -164,21 +168,10 @@ class CustomAboutActivity : AppCompatActivity(), View.OnClickListener {
         mBinding.aboutHeaderAppVersion.text = "Version ${BuildConfig.VERSION_NAME}"
         mBinding.aboutBottomAppVersion.text = "Version ${BuildConfig.VERSION_NAME}"
 
-        mBinding.aboutHeaderGithub.setOnClickListener(this)
-        TooltipCompat.setTooltipText(mBinding.aboutHeaderGithub, "GitHub")
-
-        mBinding.aboutHeaderTelegram.setOnClickListener(this)
-        TooltipCompat.setTooltipText(mBinding.aboutHeaderTelegram, "Telegram")
+        mBinding.aboutHeaderGithub.semSetToolTipText("GitHub")
+        mBinding.aboutHeaderTelegram.semSetToolTipText( "Telegram")
 
         with(mBinding.aboutBottomContent) {
-            aboutBottomDevYann.setOnClickListener(this@CustomAboutActivity)
-            aboutBottomDevMesa.setOnClickListener(this@CustomAboutActivity)
-            aboutBottomOssApache.setOnClickListener(this@CustomAboutActivity)
-            aboutBottomOssMit.setOnClickListener(this@CustomAboutActivity)
-            aboutBottomRelativeJetpack.setOnClickListener(this@CustomAboutActivity)
-            aboutBottomRelativeMaterial.setOnClickListener(this@CustomAboutActivity)
-            aboutBottomDevTribalfs.setOnClickListener(this@CustomAboutActivity)
-
             aboutBottomDevYann.loadImageFromUrl("https://avatars.githubusercontent.com/u/57589186?v=4")
             aboutBottomDevMesa.loadImageFromUrl("https://avatars.githubusercontent.com/u/13062958?v=4")
             aboutBottomDevTribalfs.loadImageFromUrl("https://avatars.githubusercontent.com/u/65062033?v=4")
@@ -190,59 +183,63 @@ class CustomAboutActivity : AppCompatActivity(), View.OnClickListener {
         mContentEnabled = enabled
         mBinding.aboutHeaderGithub.isEnabled = !enabled
         mBinding.aboutHeaderTelegram.isEnabled = !enabled
-        with(mBinding.aboutBottomContent) {
-            aboutBottomDevYann.isEnabled = enabled
-            aboutBottomDevMesa.isEnabled = enabled
-            aboutBottomOssApache.isEnabled = enabled
-            aboutBottomOssMit.isEnabled = enabled
-            aboutBottomRelativeJetpack.isEnabled = enabled
-            aboutBottomRelativeMaterial.isEnabled = enabled
-            aboutBottomDevTribalfs.isEnabled = enabled
-        }
+        setEnableCardItemChilds(mBinding.aboutBottomContent.aboutBottom, enabled)
     }
-
-    override fun onClick(v: View) {
-        with(mBinding.aboutBottomContent) {
-            when (v.id) {
-                mBinding.aboutHeaderGithub.id -> {
-                    openUrl("https://github.com/tribalfs/oneui-design")
-                }
-
-                mBinding.aboutHeaderTelegram.id -> {
-                    openUrl("https://t.me/oneuiproject")
-                }
-
-                aboutBottomDevTribalfs.id -> {
-                    openUrl("https://github.com/tribalfs")
-                }
-
-                aboutBottomDevYann.id -> {
-                    openUrl("https://github.com/Yanndroid")
-                }
-
-                aboutBottomDevMesa.id -> {
-                    openUrl("https://github.com/salvogiangri")
-                }
-
-                aboutBottomOssApache.id -> {
-                    openUrl("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                }
-
-                aboutBottomOssMit.id -> {
-                    openUrl("https://raw.githubusercontent.com/tribalfs/oneui-design/refs/heads/sample_setup_sesl6/LICENSE")
-                }
-
-                aboutBottomRelativeMaterial.id -> {
-                    openUrl("https://github.com/tribalfs/sesl-material-components-android")
-                }
-
-                aboutBottomRelativeJetpack.id -> {
-                    openUrl("https://github.com/tribalfs/sesl-androidx")
-                }
+    
+    private fun setEnableCardItemChilds(view: View, enabled: Boolean) {
+        if (view is CardItemView){
+            view.isEnabled = enabled
+            return
+        }
+        if (view is ViewGroup) {
+            view.children.forEach {
+                setEnableCardItemChilds(it, enabled)
             }
         }
     }
 
+    private fun setupClickListeners() {
+        mBinding.aboutHeaderGithub.setOnClickListener{
+            openUrl("https://github.com/tribalfs/oneui-design")
+        }
+        mBinding.aboutHeaderTelegram.setOnClickListener {
+            openUrl("https://t.me/oneuiproject")
+        }
+
+        with(mBinding.aboutBottomContent) {
+            aboutBottomDevYann.setOnClickListener {
+                openUrl("https://github.com/Yanndroid")
+            }
+            aboutBottomDevMesa.setOnClickListener {
+                openUrl("https://github.com/salvogiangri")
+            }
+            aboutBottomOssApache.setOnClickListener {
+                openUrl("https://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+            aboutBottomOssMit.setOnClickListener {
+                openUrl("https://raw.githubusercontent.com/tribalfs/oneui-design/" +
+                        "refs/heads/oneui6/LICENSE")
+            }
+            aboutBottomRelativeJetpack.setOnClickListener {
+                openUrl("https://github.com/tribalfs/sesl-androidx")
+            }
+            aboutBottomRelativeMaterial.setOnClickListener {
+                openUrl("https://github.com/tribalfs/sesl-material-components-android")
+            }
+            aboutBottomDevTribalfs.setOnClickListener {
+                openUrl("https://github.com/tribalfs")
+            }
+            aboutBottomRelativeSeslAndroidx.setOnClickListener {
+                openUrl("https://github.com/tribalfs/sesl-androidx")
+            }
+            aboutBottomRelativeSeslMaterial.setOnClickListener {
+                openUrl("https://github.com/tribalfs/sesl-material-components-android")
+            }
+            aboutBottomRelativeDesign6.setOnClickListener {
+                openUrl("https://github.com/tribalfs/oneui-design")
+            }
+        }
+    }
 
     private inner class AboutAppBarListener : OnOffsetChangedListener {
         override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {

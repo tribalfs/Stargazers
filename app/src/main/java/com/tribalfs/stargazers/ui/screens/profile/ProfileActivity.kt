@@ -23,8 +23,8 @@ import com.tribalfs.stargazers.ui.core.util.SharingUtils.share
 import com.tribalfs.stargazers.ui.core.util.loadImageFromUrl
 import com.tribalfs.stargazers.ui.core.util.onSingleClick
 import com.tribalfs.stargazers.ui.core.util.openUrl
-import com.tribalfs.stargazers.ui.core.util.semSetToolTipText
 import com.tribalfs.stargazers.ui.core.util.toast
+import dev.oneuiproject.oneui.ktx.semSetToolTipText
 import dev.oneuiproject.oneui.utils.DeviceLayoutUtil.isTabletLayoutOrDesktop
 import dev.oneuiproject.oneui.widget.CardItemView
 import dev.oneuiproject.oneui.R as designR
