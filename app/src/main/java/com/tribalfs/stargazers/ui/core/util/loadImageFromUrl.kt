@@ -8,6 +8,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import dev.oneuiproject.oneui.widget.CardItemView
+import dev.oneuiproject.oneui.widget.QRImageView
 
 fun ImageView.loadImageFromUrl(imageUrl: String){
     Glide.with(context)
@@ -43,5 +44,18 @@ fun CardItemView.loadImageFromUrl(imageUrl: String){
 
             override fun onLoadCleared(placeholder: Drawable?) {
             }
+        })
+}
+
+fun QRImageView.loadImageFromUrl(imageUrl: String){
+    Glide.with(this)
+        .load(imageUrl)
+        .circleCrop()
+        .into(object : CustomTarget<Drawable>() {
+            override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                setIcon(resource)
+                invalidate()
+            }
+            override fun onLoadCleared(placeholder: Drawable?) {}
         })
 }

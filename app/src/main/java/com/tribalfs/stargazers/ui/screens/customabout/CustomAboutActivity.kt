@@ -10,11 +10,9 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.animation.PathInterpolatorCompat
 import androidx.core.view.updateLayoutParams
-import androidx.preference.Preference
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.tribalfs.stargazers.BuildConfig
@@ -25,7 +23,6 @@ import com.tribalfs.stargazers.ui.core.util.openApplicationSettings
 import com.tribalfs.stargazers.ui.core.util.openUrl
 import dev.oneuiproject.oneui.ktx.invokeOnBack
 import dev.oneuiproject.oneui.ktx.isInMultiWindowModeCompat
-import dev.oneuiproject.oneui.ktx.onClick
 import dev.oneuiproject.oneui.utils.DeviceLayoutUtil.isPortrait
 import dev.oneuiproject.oneui.utils.internal.ToolbarLayoutUtils
 import kotlinx.coroutines.flow.MutableStateFlow

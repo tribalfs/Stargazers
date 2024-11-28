@@ -1,20 +1,17 @@
 package com.tribalfs.stargazers.ui.screens.profile
 
 import android.app.Dialog
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.BundleCompat
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tribalfs.stargazers.data.model.Stargazer
 import com.tribalfs.stargazers.databinding.ViewQrBottomsheetBinding
+import com.tribalfs.stargazers.ui.core.util.loadImageFromUrl
 import com.tribalfs.stargazers.ui.core.util.toast
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_STARGAZER
 
@@ -59,22 +56,14 @@ class QRBottomSheet : BottomSheetDialogFragment() {
             Stargazer::class.java
         )!!
         binding.sgName.text = stargazer.getDisplayName()
-        binding.noteTv.text = "Scan this QR code on another device to view the ${stargazer.getDisplayName()}'s profile."
+        binding.noteTv.text =
+            "Scan this QR code on another device to view ${stargazer.getDisplayName()}'s profile."
 
-        Glide.with(this)
-            .load(stargazer.avatar_url)
-            .circleCrop()
-            .into(object : CustomTarget<Drawable>() {
-                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                    binding.qrCode.apply {
-                        setContent(stargazer.html_url)
-                        setIcon(resource)
-                        invalidate()
-                    }
-                }
-
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
+        binding.qrCode.apply {
+            setContent(stargazer.html_url)
+            loadImageFromUrl(stargazer.avatar_url)
+            invalidate()
+        }
 
         binding.quickShareBtn.setOnClickListener {
             //TODO
@@ -86,5 +75,4 @@ class QRBottomSheet : BottomSheetDialogFragment() {
             toast("Todo()")
         }
     }
-
 }
