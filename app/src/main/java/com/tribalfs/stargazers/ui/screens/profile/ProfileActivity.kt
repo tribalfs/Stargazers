@@ -1,6 +1,5 @@
 package com.tribalfs.stargazers.ui.screens.profile
 
-import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.transition.AutoTransition
@@ -22,8 +21,8 @@ import com.tribalfs.stargazers.ui.core.util.SharingUtils.isSamsungQuickShareAvai
 import com.tribalfs.stargazers.ui.core.util.SharingUtils.share
 import com.tribalfs.stargazers.ui.core.util.loadImageFromUrl
 import com.tribalfs.stargazers.ui.core.util.onSingleClick
+import com.tribalfs.stargazers.ui.core.util.openEmail
 import com.tribalfs.stargazers.ui.core.util.openUrl
-import com.tribalfs.stargazers.ui.core.util.toast
 import dev.oneuiproject.oneui.ktx.semSetToolTipText
 import dev.oneuiproject.oneui.utils.DeviceLayoutUtil.isTabletLayoutOrDesktop
 import dev.oneuiproject.oneui.widget.CardItemView
@@ -93,7 +92,7 @@ class ProfileActivity : AppCompatActivity(){
             email?.let {e ->
                 mBinding.stargazerButtons.stargazerEmailBtn.apply {
                     isVisible = true
-                    onSingleClick { toast("Todo") }
+                    onSingleClick { openEmail(e) }
                     semSetToolTipText(e)
                 }
             }
