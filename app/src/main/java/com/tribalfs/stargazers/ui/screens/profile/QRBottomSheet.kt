@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.BundleCompat
@@ -18,7 +18,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tribalfs.stargazers.data.model.Stargazer
 import com.tribalfs.stargazers.databinding.ViewQrBottomsheetBinding
 import com.tribalfs.stargazers.ui.core.util.SharingUtils.isSamsungQuickShareAvailable
-import com.tribalfs.stargazers.ui.core.util.SharingUtils.share
+import com.tribalfs.stargazers.ui.core.util.SharingUtils.shareForResult
 import com.tribalfs.stargazers.ui.core.util.loadImageFromUrl
 import com.tribalfs.stargazers.ui.core.util.toast
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_STARGAZER
@@ -29,6 +29,7 @@ class QRBottomSheet : BottomSheetDialogFragment() {
 
     private  var _binding: ViewQrBottomsheetBinding? = null
     private val binding get() = _binding!!
+    private var tempImageFile: File? = null
 
     companion object {
         fun newInstance(stargazer: Stargazer): QRBottomSheet {
@@ -78,13 +79,11 @@ class QRBottomSheet : BottomSheetDialogFragment() {
             text =  if (context.isSamsungQuickShareAvailable()) "Quick Share" else "Share"
             setOnClickListener {
                 val storageDir = requireContext().filesDir
-                val qrImageFile = File(storageDir, "${stargazer.getDisplayName()}_qrCode_${System.currentTimeMillis()}.png")
-                FileOutputStream(qrImageFile).use { out ->
+                tempImageFile = File(storageDir, "${stargazer.getDisplayName()}_qrCode_${System.currentTimeMillis()}.png")
+                FileOutputStream(tempImageFile).use { out ->
                     binding.qrCode.drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, out)
                 }
-                qrImageFile.share(requireContext()){
-                    qrImageFile.delete()
-                }
+                tempImageFile!!.shareForResult(requireContext(), "Share QR code", null, shareImageResultLauncher)
             }
         }
 
@@ -97,8 +96,12 @@ class QRBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    private var shareImageResultLauncher = registerForActivityResult(StartActivityForResult()) {
+        tempImageFile?.delete()
+    }
+
     private var saveImageResultLauncher  = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
+        StartActivityForResult()
     ) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK) {
             val bitmap = binding.qrCode.drawable.toBitmap()

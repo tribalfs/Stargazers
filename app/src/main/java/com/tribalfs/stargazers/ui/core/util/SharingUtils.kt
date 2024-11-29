@@ -6,6 +6,7 @@ import android.content.Intent.ACTION_SEND
 import android.content.pm.PackageManager
 import android.util.Log
 import android.webkit.MimeTypeMap
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.FileProvider
 import java.io.File
 
@@ -14,22 +15,22 @@ object SharingUtils {
     private const val SAMSUNG_QUICK_SHARE_PACKAGE = "com.samsung.android.app.sharelive"
     private const val MIME_TYPE_TEXT = "text/plain"
 
-    fun File.share(context: Context, title: String? = null, subject: String? = null, onShared: (() -> Unit)? = null) {
+    fun File.share(context: Context, title: String? = null, subject: String? = null) {
         val fileUri =
             FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", this)
 
         context.createShareIntent(title, subject).apply {
             type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
             putExtra(Intent.EXTRA_STREAM, fileUri)
-            start(context, onShared)
+            start(context)
         }
     }
 
-    fun String.share(context: Context, title: String? = null, subject: String? = null, onShared: (() -> Unit)? = null) {
+    fun String.share(context: Context, title: String? = null, subject: String? = null) {
         context.createShareIntent(title, subject).apply {
             type = MIME_TYPE_TEXT
             putExtra(Intent.EXTRA_TEXT, this@share)
-            start(context, onShared)
+            start(context)
         }
     }
 
@@ -44,14 +45,13 @@ object SharingUtils {
             }
         }
 
-    private fun Intent.start(context: Context, onShared: (() -> Unit)?){
+    private fun Intent.start(context: Context){
         try {
             context.startActivity(this)
         } catch (e: Exception) {
             // Fallback to default chooser if specific package fails
             `package` = null
             context.startActivity(Intent.createChooser(this, "Share via"))
-            onShared?.invoke()
         }
     }
 
@@ -63,6 +63,21 @@ object SharingUtils {
             false
         }.also {
             Log.d("SharingUtils", "isSamsungQuickShareAvailable: $it")
+        }
+    }
+
+    @JvmOverloads
+    fun File.shareForResult(context: Context,
+                            title: String? = null,
+                            subject: String? = null,
+                            resultLauncher: ActivityResultLauncher<Intent>) {
+        val fileUri =
+            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", this)
+
+        context.createShareIntent(title, subject).apply {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+            putExtra(Intent.EXTRA_STREAM, fileUri)
+            resultLauncher.launch(this)
         }
     }
 
