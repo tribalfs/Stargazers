@@ -13,6 +13,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.IntentCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.tribalfs.stargazers.R
 import com.tribalfs.stargazers.data.model.Stargazer
 import com.tribalfs.stargazers.databinding.ActivityStargazerBinding
@@ -26,6 +27,7 @@ import com.tribalfs.stargazers.ui.core.util.openUrl
 import dev.oneuiproject.oneui.ktx.semSetToolTipText
 import dev.oneuiproject.oneui.utils.DeviceLayoutUtil.isTabletLayoutOrDesktop
 import dev.oneuiproject.oneui.widget.CardItemView
+import kotlinx.coroutines.launch
 import dev.oneuiproject.oneui.R as designR
 
 
@@ -194,9 +196,9 @@ class ProfileActivity : AppCompatActivity(){
         mBinding.bottomNav.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.menu_sg_share -> {
-                    val shareText = "Check out this amazing stargazer's profile:" +
-                            "\n${stargazer.html_url}"
-                    shareText.share(this)
+                    lifecycleScope.launch {
+                        stargazer.asVCardFile(this@ProfileActivity).share(this@ProfileActivity)
+                    }
                     true
                 }
                 R.id.menu_sg_qrcode -> {

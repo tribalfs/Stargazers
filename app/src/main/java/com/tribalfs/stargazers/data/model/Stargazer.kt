@@ -1,13 +1,18 @@
 package com.tribalfs.stargazers.data.model
 
+import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.tribalfs.stargazers.data.local.util.Converters
+import com.tribalfs.stargazers.data.util.Converters
+import com.tribalfs.stargazers.data.util.getAvatarBase64Data
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import java.io.File
 
 @Keep
 @Parcelize
@@ -34,4 +39,30 @@ data class Stargazer(
 
     fun getDisplayName(): String = name ?: login
     fun getSearchableString(): String = "${name?:""} $html_url"
+
+    suspend fun asVCardFile(context: Context) = withContext(Dispatchers.IO) {
+        File(context.cacheDir, "stargazer_${id}_${getDisplayName()}.vcf")
+            .apply { writeText(getVCardContent(context)) }
+    }
+
+    private suspend fun getVCardContent(context: Context) = buildString {
+        appendLine("BEGIN:VCARD")
+        appendLine("VERSION:2.1")
+        appendLine("FN:${getDisplayName()}")
+        appendLine("NICKNAME:${login}")
+        // appendLine("PHOTO;VALUE=URI:${avatar_url}")
+        appendLine("URL:${html_url}")
+        email?.let { appendLine("EMAIL:$it") }
+        company?.let { appendLine("ORG:$it") }
+        location?.let { appendLine("ADR:$it") }
+        bio?.let { appendLine("TITLE:$it") }
+        blog?.let { appendLine("URL:$it") }
+        organizations_url?.let { appendLine("URL:$it") }
+        twitter_username?.let { appendLine("X-TWITTER:https://x.com/$it") }
+        getAvatarBase64Data(avatar_url, context)?.let { base64Image ->
+            appendLine("PHOTO;ENCODING=BASE64;TYPE=PNG:$base64Image")
+        }
+        appendLine("NOTE:Starred repos: ${starredRepos.joinToString(", ")}")
+        appendLine("END:VCARD")
+    }
 }

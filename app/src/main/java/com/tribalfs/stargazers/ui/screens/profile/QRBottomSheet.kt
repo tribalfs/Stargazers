@@ -83,7 +83,7 @@ class QRBottomSheet : BottomSheetDialogFragment() {
                 FileOutputStream(tempImageFile).use { out ->
                     binding.qrCode.drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, out)
                 }
-                tempImageFile!!.shareForResult(requireContext(), "Share QR code", null, shareImageResultLauncher)
+                tempImageFile!!.shareForResult(requireContext(), shareImageResultLauncher)
             }
         }
 

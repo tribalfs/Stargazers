@@ -25,4 +25,7 @@ interface StargazersDao {
         insertAll(stargazers)
     }
 
+    @Query("SELECT * FROM stargazers WHERE id IN (:ids)")
+    suspend fun getStargazersById(ids: IntArray): List<Stargazer>
+
 }

@@ -77,6 +77,9 @@ class StargazersRepo private constructor(context: Context) {
         }
     }
 
+    suspend fun getStargazersById(ids: IntArray): List<Stargazer> =
+        database.stargazerDao().getStargazersById(ids)
+
     companion object {
         @Volatile
         private var INSTANCE: StargazersRepo? = null

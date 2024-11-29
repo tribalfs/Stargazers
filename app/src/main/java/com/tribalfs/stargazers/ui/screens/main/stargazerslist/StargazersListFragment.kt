@@ -24,11 +24,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.tribalfs.stargazers.R
 import com.tribalfs.stargazers.data.StargazersRepo
 import com.tribalfs.stargazers.databinding.FragmentStargazersListBinding
+import com.tribalfs.stargazers.ui.core.util.SharingUtils.share
 import com.tribalfs.stargazers.ui.core.util.isOnline
 import com.tribalfs.stargazers.ui.core.util.launchAndRepeatWithViewLifecycle
 import com.tribalfs.stargazers.ui.core.util.openUrl
 import com.tribalfs.stargazers.ui.core.util.seslSetFastScrollerEnabledForApi24
-import com.tribalfs.stargazers.ui.core.util.toast
 import com.tribalfs.stargazers.ui.core.view.TouchBlockingView
 import com.tribalfs.stargazers.ui.screens.main.MainActivity
 import com.tribalfs.stargazers.ui.screens.main.MainActivity.Companion.KEY_REPO_NAME
@@ -343,11 +343,18 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                     stargazersAdapter.onToggleActionMode(false)
                     binding.fab.isVisible = !drawerLayout.isSearchMode
                 },
-                onSelectMenuItem = {
+                onSelectMenuItem = { it ->
                     when (it.itemId) {
                         R.id.menu_contacts_am_share -> {
-                            requireActivity().toast("Todo(Share!)")
-                            drawerLayout.endActionMode()
+                            lifecycleScope.launch {
+                                stargazersAdapter.getSelectedIds().asSet()
+                                    .map { id -> id.toInt() }//convert back to stargazer's id
+                                    .toIntArray()
+                                    .let { stargazersViewModel.getStargazersById(it) }
+                                    .map { it.asVCardFile(requireContext()) }
+                                    .share(requireContext())
+                                drawerLayout.endActionMode()
+                            }
                             true
                         }
 

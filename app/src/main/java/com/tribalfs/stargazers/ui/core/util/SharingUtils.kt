@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package com.tribalfs.stargazers.ui.core.util
 
 import android.content.Context
@@ -7,37 +9,50 @@ import android.content.pm.PackageManager
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.activity.result.ActivityResultLauncher
-import androidx.core.content.FileProvider
 import java.io.File
 
 object SharingUtils {
 
     private const val SAMSUNG_QUICK_SHARE_PACKAGE = "com.samsung.android.app.sharelive"
     private const val MIME_TYPE_TEXT = "text/plain"
+    private const val MIME_TYPE_VCARD = "text/x-vcard"
+    private const val TAG = "SharingUtils"
 
-    fun File.share(context: Context, title: String? = null, subject: String? = null) {
-        val fileUri =
-            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", this)
+    inline fun File.share(context: Context) {
+        listOf(this).share(context)
+    }
 
-        context.createShareIntent(title, subject).apply {
-            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-            putExtra(Intent.EXTRA_STREAM, fileUri)
+    fun List<File>.share(context: Context) {
+        val contentUris = map { f -> f.getFileUri(context)}
+
+        if (contentUris.isEmpty()){
+            Log.e(TAG, "No file to share.")
+            return
+        }
+
+        context.createBaseIntent().apply {
+            this.type = MIME_TYPE_VCARD
+            if (contentUris.size == 1){
+                putExtra(Intent.EXTRA_STREAM, contentUris[0] )
+            }else{
+                action = Intent.ACTION_SEND_MULTIPLE
+                putExtra(Intent.EXTRA_STREAM,  ArrayList(contentUris))
+            }
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             start(context)
         }
     }
 
-    fun String.share(context: Context, title: String? = null, subject: String? = null) {
-        context.createShareIntent(title, subject).apply {
+    fun String.share(context: Context) {
+        context.createBaseIntent().apply {
             type = MIME_TYPE_TEXT
             putExtra(Intent.EXTRA_TEXT, this@share)
             start(context)
         }
     }
 
-    private fun Context.createShareIntent(title: String?, subject: String?) =
+    private inline fun Context.createBaseIntent() =
         Intent().apply {
-            putExtra(Intent.EXTRA_TITLE, title)
-            putExtra(Intent.EXTRA_SUBJECT, subject)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             action = ACTION_SEND
             if (isSamsungQuickShareAvailable()) {
@@ -45,10 +60,11 @@ object SharingUtils {
             }
         }
 
-    private fun Intent.start(context: Context){
+    private inline fun Intent.start(context: Context){
         try {
             context.startActivity(this)
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to start activity with specific package: ${e.message}")
             // Fallback to default chooser if specific package fails
             `package` = null
             context.startActivity(Intent.createChooser(this, "Share via"))
@@ -62,21 +78,19 @@ object SharingUtils {
         } catch (e: PackageManager.NameNotFoundException) {
             false
         }.also {
-            Log.d("SharingUtils", "isSamsungQuickShareAvailable: $it")
+            Log.i(TAG, "isSamsungQuickShareAvailable: $it")
         }
     }
 
-    @JvmOverloads
-    fun File.shareForResult(context: Context,
-                            title: String? = null,
-                            subject: String? = null,
-                            resultLauncher: ActivityResultLauncher<Intent>) {
-        val fileUri =
-            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", this)
 
-        context.createShareIntent(title, subject).apply {
+    // Note: This does not actually returns a result to the caller
+    // ActivityResultLauncher. The latter will always receive RESULT_CANCELLED.
+    fun File.shareForResult(context: Context,
+                            resultLauncher: ActivityResultLauncher<Intent>) {
+
+        context.createBaseIntent().apply {
             type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-            putExtra(Intent.EXTRA_STREAM, fileUri)
+            putExtra(Intent.EXTRA_STREAM, getFileUri(context))
             resultLauncher.launch(this)
         }
     }

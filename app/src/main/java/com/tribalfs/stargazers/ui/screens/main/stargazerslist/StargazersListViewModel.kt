@@ -45,6 +45,8 @@ class StargazersListViewModel (
     fun getKeepSearchModeOnActionMode(): Boolean
             = stargazerSettingsStateFlow.value.searchOnActionMode == SearchModeOnActionMode.RESUME
 
+    suspend fun getStargazersById(ids: IntArray) = stargazersRepo.getStargazersById(ids)
+
     private val _stargazersListScreenStateFlow = MutableStateFlow(StargazersListUiState())
     val stargazersListScreenStateFlow = _stargazersListScreenStateFlow.asStateFlow()
 
