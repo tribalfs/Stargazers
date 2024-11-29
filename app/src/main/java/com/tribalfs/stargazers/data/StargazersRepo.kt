@@ -53,7 +53,7 @@ class StargazersRepo private constructor(context: Context) {
     val stargazersSettingsFlow: Flow<StargazersSettings> = dataStore.data.map {
         val darkMode = determineDarkMode(
             it[PREF_DARK_MODE] ?: "0",
-            it[PREF_AUTO_DARK_MODE] ?: false)
+            it[PREF_AUTO_DARK_MODE] ?: true)
 
         StargazersSettings(
             isTextModeIndexScroll = it[PREF_INDEXSCROLL_TEXT_MODE] ?: false,
