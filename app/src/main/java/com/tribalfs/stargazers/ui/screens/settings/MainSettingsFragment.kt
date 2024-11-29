@@ -18,7 +18,7 @@ import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_INDEXSCROLL_EN
 import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_SEACH_HIGHLIGHT_COLOR
 import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_SEARCHMODE_BACK_BEHAVIOR
 import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_UPDATE_AVAILABLE
-import com.tribalfs.stargazers.data.local.util.determineDarkMode
+import com.tribalfs.stargazers.data.util.determineDarkMode
 import com.tribalfs.stargazers.ui.core.util.applyDarkMode
 import com.tribalfs.stargazers.ui.core.util.loadImageFromUrl
 import com.tribalfs.stargazers.ui.core.util.openUrl

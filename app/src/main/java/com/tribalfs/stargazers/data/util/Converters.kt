@@ -1,4 +1,4 @@
-package com.tribalfs.stargazers.data.local.util
+package com.tribalfs.stargazers.data.util
 
 import androidx.room.TypeConverter
 
