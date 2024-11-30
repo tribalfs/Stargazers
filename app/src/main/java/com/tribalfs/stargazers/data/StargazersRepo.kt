@@ -23,6 +23,7 @@ import com.tribalfs.stargazers.data.network.Update
 import com.tribalfs.stargazers.data.network.UpdateDataSource
 import com.tribalfs.stargazers.data.util.determineDarkMode
 import com.tribalfs.stargazers.data.util.toFetchStatus
+import com.tribalfs.stargazers.data.util.getEffectiveHighlightColor
 import com.tribalfs.stargazers.data.util.toSearchModeOnActionMode
 import com.tribalfs.stargazers.data.util.toSearchModeOnBackBehavior
 import dev.oneuiproject.oneui.layout.AppInfoLayout.UPDATE_AVAILABLE
@@ -95,7 +96,9 @@ class StargazersRepo private constructor(context: Context) {
             autoHideIndexScroll = it[PREF_INDEXSCROLL_AUTO_HIDE] ?: true,
             searchOnActionMode = it[PREF_ACTIONMODE_SEARCH].toSearchModeOnActionMode(),
             searchModeBackBehavior = it[PREF_SEARCHMODE_BACK_BEHAVIOR].toSearchModeOnBackBehavior(),
-            searchHighlightColor = it[PREF_SEACH_HIGHLIGHT_COLOR] ?: Color.parseColor("#2196F3"),
+            searchHighlightColor =  getEffectiveHighlightColor(
+                it[PREF_CUSTOM_HIGHLIGHT_COLOR] ?: true,
+                it[PREF_SEARCH_HIGHLIGHT_COLOR] ?: Color.parseColor("#2196F3")),
             darkModeOption = darkMode,
             enableIndexScroll = it[PREF_INDEXSCROLL_ENABLE] ?: true,
             lastRefresh = it[PREF_LAST_REFRESH] ?: 0,
@@ -135,7 +138,8 @@ class StargazersRepo private constructor(context: Context) {
         val PREF_INDEXSCROLL_AUTO_HIDE = booleanPreferencesKey("indexScrollAutoHide")
         val PREF_ACTIONMODE_SEARCH = stringPreferencesKey("actionModeSearch")
         val PREF_SEARCHMODE_BACK_BEHAVIOR = stringPreferencesKey("searchModeBackBehavior")
-        val PREF_SEACH_HIGHLIGHT_COLOR = intPreferencesKey("searchColor")
+        val PREF_CUSTOM_HIGHLIGHT_COLOR = booleanPreferencesKey("useCustomHighlightColor")
+        val PREF_SEARCH_HIGHLIGHT_COLOR = intPreferencesKey("searchColor")
         val PREF_DARK_MODE = stringPreferencesKey("darkMode")
         val PREF_AUTO_DARK_MODE = booleanPreferencesKey("darkModeAuto")
         val PREF_LAST_REFRESH = longPreferencesKey("lastRefresh")

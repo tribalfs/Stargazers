@@ -39,12 +39,13 @@ class StargazersAdapter (
     init {
         setHasStableIds(true)
     }
-    private val stringHighlight = SearchHighlighter()
+
+    private val stringHighlight = SearchHighlighter(context)
 
     var searchHighlightColor: Int
         @ColorInt
         get() = stringHighlight.highlightColor
-        set(@ColorInt color: Int) {
+        set(@ColorInt color) {
             if (stringHighlight.highlightColor != color) {
                 stringHighlight.highlightColor = color
                 notifyItemRangeChanged(0, itemCount, Payload.HIGHLIGHT)

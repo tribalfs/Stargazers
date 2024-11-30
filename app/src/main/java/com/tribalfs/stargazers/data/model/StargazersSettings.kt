@@ -13,7 +13,7 @@ data class StargazersSettings(
     val searchOnActionMode: SearchModeOnActionMode = SearchModeOnActionMode.DISMISS,
     val searchModeBackBehavior: SearchModeOnBackBehavior = SearchModeOnBackBehavior.CLEAR_DISMISS,
     @ColorInt
-    val searchHighlightColor: Int = Color.parseColor("#2196F3"),
+    val searchHighlightColor: Int = -1,
     val darkModeOption: DarkMode = DarkMode.AUTO,
     val enableIndexScroll: Boolean = true,
     val lastRefresh: Long = 0L,

@@ -63,11 +63,18 @@
             android:title="Filter mode"
             android:defaultValue="true" />-->
 
+        <SwitchPreferenceCompat
+            android:disableDependentsState="false"
+            android:key="useCustomHighlightColor"
+            android:title="Custom highlight color"
+            android:defaultValue="false" />-->
+
         <dev.oneuiproject.oneui.preference.ColorPickerPreference
             android:key="searchColor"
             android:title="Highlight color"
             android:defaultValue="#2196F3"
-            app:showAlphaSlider="true" />
+            app:showAlphaSlider="true"
+            android:dependency="useCustomHighlightColor"/>
 
     </PreferenceCategory>
 

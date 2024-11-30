@@ -13,9 +13,10 @@ import androidx.preference.SwitchPreferenceCompat
 import com.tribalfs.stargazers.R
 import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_ACTIONMODE_SEARCH
 import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_AUTO_DARK_MODE
+import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_CUSTOM_HIGHLIGHT_COLOR
 import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_DARK_MODE
 import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_INDEXSCROLL_ENABLE
-import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_SEACH_HIGHLIGHT_COLOR
+import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_SEARCH_HIGHLIGHT_COLOR
 import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_SEARCHMODE_BACK_BEHAVIOR
 import com.tribalfs.stargazers.data.StargazersRepo.Companion.PREF_UPDATE_AVAILABLE
 import com.tribalfs.stargazers.data.util.determineDarkMode
@@ -84,7 +85,7 @@ class MainSettingsFragment : AbsBasePreferencesFragment(){
 
         findPreference<ListPreference>(PREF_SEARCHMODE_BACK_BEHAVIOR.name)!!.setSummaryUpdatable(true)
 
-        findPreference<ColorPickerPreference>(PREF_SEACH_HIGHLIGHT_COLOR.name)!!.apply {
+        val customSearchColorPref =  findPreference<ColorPickerPreference>(PREF_SEARCH_HIGHLIGHT_COLOR.name)!!.apply {
             setSummaryUpdatable(true)
             @OptIn(ExperimentalStdlibApi::class)
             summaryProvider = SummaryProvider<ColorPickerPreference> {
@@ -92,6 +93,10 @@ class MainSettingsFragment : AbsBasePreferencesFragment(){
             }
         }
 
+        findPreference<SwitchPreferenceCompat>(PREF_CUSTOM_HIGHLIGHT_COLOR.name)!!.apply {
+            onNewValue { customSearchColorPref.isVisible = it }
+            customSearchColorPref.isVisible = isChecked
+        }
 
         findPreference<Preference>("about")!!.apply {
             onClick {
