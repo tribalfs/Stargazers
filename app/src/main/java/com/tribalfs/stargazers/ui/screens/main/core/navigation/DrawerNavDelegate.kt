@@ -44,7 +44,7 @@ class MainNavigationDelegate: AppNavigation {
             R.id.sesl_material_dest -> bundleOf(KEY_REPO_NAME to "sesl-material-components-android")
             R.id.design_lib_dest -> bundleOf(KEY_REPO_NAME to "oneui-design")
             R.id.stargazer_dest -> bundleOf(KEY_REPO_NAME to "Stargazers")
-            else ->  bundleOf("repoName" to "")
+            else ->  bundleOf(KEY_REPO_NAME to "")
         }
 
     override fun initNavigation(drawerLayout: DrawerLayout, drawerListView: RecyclerView, navController: NavController) {
