@@ -72,7 +72,7 @@ dependencies {
     implementation("sesl.com.google.android.material:material:1.12.0+1.0.23-sesl6+rev2")
 
     //design lib
-    implementation("io.github.tribalfs:oneui-design:0.2.7+oneui6")
+    implementation("io.github.tribalfs:oneui-design:0.2.8+oneui6")
 
     //These are still OneUI4/5 icons.
     //Hopefully someone will update this.
