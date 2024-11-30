@@ -22,6 +22,9 @@ import com.tribalfs.stargazers.databinding.ActivityAboutAppCustomBinding
 import com.tribalfs.stargazers.ui.core.util.loadImageFromUrl
 import com.tribalfs.stargazers.ui.core.util.openApplicationSettings
 import com.tribalfs.stargazers.ui.core.util.openUrl
+import com.tribalfs.stargazers.ui.screens.customabout.CustomAboutActivity.ContentState.DISABLED
+import com.tribalfs.stargazers.ui.screens.customabout.CustomAboutActivity.ContentState.ENABLED
+import com.tribalfs.stargazers.ui.screens.customabout.CustomAboutActivity.ContentState.UNSET
 import dev.oneuiproject.oneui.ktx.invokeOnBack
 import dev.oneuiproject.oneui.ktx.isInMultiWindowModeCompat
 import dev.oneuiproject.oneui.ktx.semSetToolTipText
@@ -35,7 +38,7 @@ class CustomAboutActivity : AppCompatActivity(){
 
     private lateinit var mBinding: ActivityAboutAppCustomBinding
     private val mAppBarListener = AboutAppBarListener()
-    private var mContentEnabled = false
+    private var mContentState: ContentState = UNSET
     private val progressInterpolator =   PathInterpolatorCompat.create(0f, 0f, 0f, 1f)
     private val callbackIsActiveState = MutableStateFlow(false)
     private var isBackProgressing = false
@@ -157,7 +160,7 @@ class CustomAboutActivity : AppCompatActivity(){
             }
             mBinding.aboutBottomContainer.alpha = 1f
             mBinding.aboutSwipeUpContainer.visibility = View.GONE
-            setBottomContentEnabled(true)
+            setBottomContentEnabled(ENABLED)
         }
     }
 
@@ -178,12 +181,12 @@ class CustomAboutActivity : AppCompatActivity(){
         }
     }
 
-    private fun setBottomContentEnabled(enabled: Boolean) {
-        if (mContentEnabled == enabled) return
-        mContentEnabled = enabled
-        mBinding.aboutHeaderGithub.isEnabled = !enabled
-        mBinding.aboutHeaderTelegram.isEnabled = !enabled
-        setEnableCardItemChilds(mBinding.aboutBottomContent.aboutBottom, enabled)
+    private fun setBottomContentEnabled(contentState: ContentState) {
+        if (mContentState == contentState) return
+        mContentState = contentState
+        mBinding.aboutHeaderGithub.isEnabled = contentState == DISABLED
+        mBinding.aboutHeaderTelegram.isEnabled = contentState == DISABLED
+        setEnableCardItemChilds(mBinding.aboutBottomContent.aboutBottom, contentState == ENABLED)
     }
     
     private fun setEnableCardItemChilds(view: View, enabled: Boolean) {
@@ -248,10 +251,10 @@ class CustomAboutActivity : AppCompatActivity(){
             val abs = abs(verticalOffset)
             if (abs >= totalScrollRange / 2) {
                 mBinding.aboutSwipeUpContainer.alpha = 0f
-                setBottomContentEnabled(true)
+                setBottomContentEnabled(ENABLED)
             } else if (abs == 0) {
                 mBinding.aboutSwipeUpContainer.alpha = 1f
-                setBottomContentEnabled(false)
+                setBottomContentEnabled(DISABLED)
             } else {
                 val offsetAlpha = appBarLayout.y / totalScrollRange
                 mBinding.aboutSwipeUpContainer.alpha = (1 - offsetAlpha * -3).coerceIn(0f, 1f)
@@ -279,4 +282,9 @@ class CustomAboutActivity : AppCompatActivity(){
         }
     }
 
+    private enum class ContentState{
+        UNSET,
+        ENABLED,
+        DISABLED
+    }
 }
