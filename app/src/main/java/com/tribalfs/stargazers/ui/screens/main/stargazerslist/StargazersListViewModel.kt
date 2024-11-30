@@ -1,11 +1,15 @@
 package com.tribalfs.stargazers.ui.screens.main.stargazerslist
 
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.tribalfs.stargazers.app.StargazersApp
 import com.tribalfs.stargazers.data.StargazersRepo
+import com.tribalfs.stargazers.data.model.FetchState
 import com.tribalfs.stargazers.data.model.SearchModeOnActionMode
 import com.tribalfs.stargazers.data.model.StargazersSettings
+import com.tribalfs.stargazers.ui.core.util.isOnline
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.model.StargazersListUiState
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.util.toFilteredStargazerUiModelList
 import dev.oneuiproject.oneui.delegates.AllSelectorState
@@ -14,27 +18,21 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
 class StargazersListViewModel (
-    private val stargazersRepo: StargazersRepo
-): ViewModel() {
-
-    enum class LoadState{
-        LOADING,
-        REFRESHING,
-        LOADED,
-        ERROR
-    }
+    private val stargazersRepo: StargazersRepo,
+    app: StargazersApp): AndroidViewModel(app) {
 
     private val _queryStateFlow = MutableStateFlow("")
     private val _repoFilterStateFlow = MutableStateFlow("")
-    private val _loadStateFlow = MutableStateFlow(LoadState.LOADED)
 
     val stargazerSettingsStateFlow = stargazersRepo.stargazersSettingsFlow
         .stateIn(viewModelScope, Lazily, StargazersSettings())
@@ -50,64 +48,61 @@ class StargazersListViewModel (
     private val _stargazersListScreenStateFlow = MutableStateFlow(StargazersListUiState())
     val stargazersListScreenStateFlow = _stargazersListScreenStateFlow.asStateFlow()
 
+    private val _userMessage: MutableStateFlow<String?> = MutableStateFlow(null)
+    val userMessage: StateFlow<String?> = _userMessage
+    fun setUserMessageShown() = _userMessage.update { null }
+
     init {
         viewModelScope.launch {
-            combine(
-                stargazersRepo.stargazersFlow,
-                _queryStateFlow,
-                _repoFilterStateFlow,
-                _loadStateFlow
-            ) { stargazers, query, repoFilter, loadState ->
-                if (stargazers.isEmpty()) {
-                    refreshStargazers(true)
+            launch {
+                combine(
+                    stargazersRepo.stargazersFlow,
+                    _queryStateFlow,
+                    _repoFilterStateFlow,
+                    stargazersRepo.fetchStatusFlow
+                ) { stargazers, query, repoFilter, fetchStatus ->
+                    val itemsList = stargazers.toFilteredStargazerUiModelList(query, repoFilter)
+                    val noItemText = getNoItemText(fetchStatus, query)
+                    StargazersListUiState(
+                        itemsList = itemsList,
+                        query = query,
+                        noItemText = noItemText,
+                        fetchStatus = fetchStatus
+                    )
+                }.collectLatest { uiState ->
+                    _stargazersListScreenStateFlow.value = uiState
                 }
-                val itemsList = stargazers.toFilteredStargazerUiModelList(query, repoFilter)
-                val noItemText = getNoItemText(loadState, query)
-                StargazersListUiState(
-                    itemsList = itemsList,
-                    query = query,
-                    noItemText = noItemText,
-                    loadState = loadState
-                )
-            }.collectLatest { uiState ->
-                _stargazersListScreenStateFlow.value = uiState
             }
-
         }
     }
 
-    private fun getNoItemText(loadState: LoadState,  query: String): String{
-        return when (loadState) {
-            LoadState.LOADING -> "Loading stargazers..."
-            LoadState.REFRESHING -> ""
-            LoadState.LOADED -> if (query.isEmpty()) "No stargazers yet." else "No results found."
-            LoadState.ERROR -> "Error loading stargazers."
+    private fun getNoItemText(fetchState: FetchState, query: String): String{
+        return when (fetchState) {
+            FetchState.INITING -> "Loading stargazers..."
+            FetchState.INIT_ERROR -> "Error loading stargazers."
+            //These will only be visible when rv is empty.
+            FetchState.INITED, FetchState.REFRESHED -> if (query.isEmpty()) "No stargazers yet." else "No results found."
+            FetchState.NOT_INIT, FetchState.REFRESHING, FetchState.REFRESH_ERROR -> ""
         }
     }
 
-    fun isIndexScrollEnabled(): Boolean = stargazerSettingsStateFlow.value.enableIndexScroll
+    fun isIndexScrollEnabled() = stargazerSettingsStateFlow.value.enableIndexScroll
 
-    fun refreshStargazers(isRetryLoad: Boolean = false) = viewModelScope.launch {
-        var isFinishRefresh = false
-
-        if (isRetryLoad) {
-            _loadStateFlow.value = LoadState.LOADING
+    fun refreshStargazers(notifyResult: Boolean = true) = viewModelScope.launch {
+        if (!isOnline(getApplication())) {
+            _userMessage.update { "No internet connection detected." }
+            return@launch
         }
 
-        launch {
-            stargazersRepo.refreshStargazers { success ->
-                isFinishRefresh = true
-                _loadStateFlow.value = if (success) LoadState.LOADED else LoadState.ERROR
+        stargazersRepo.refreshStargazers sr@{ success, e ->
+            if (!notifyResult) return@sr
+            if (success){
+                _userMessage.update {  "Latest stargazers data successfully fetched!" }
+            }else{
+                _userMessage.update {  e?.message ?: "Error fetching stargazers." }
             }
         }
 
-        if (!isRetryLoad){
-            delay(SWITCH_TO_HPB_DELAY)
-            //We will switch to less intrusive horizontal progress bar
-            if (!isFinishRefresh){
-                _loadStateFlow.value = LoadState.REFRESHING
-            }
-        }
     }
 
     private var setFilterJob: Job? = null
@@ -119,27 +114,23 @@ class StargazersListViewModel (
         }
     }
 
-    fun setRepoFilter(repoName: String)  {
-        _repoFilterStateFlow.value = repoName
-    }
+    fun setRepoFilter(repoName: String)  { _repoFilterStateFlow.value = repoName }
 
-    val allSelectorStateFlow: MutableStateFlow <AllSelectorState> = MutableStateFlow(AllSelectorState())
+    val allSelectorStateFlow= MutableStateFlow(AllSelectorState())
 
-    fun setInitTipShown(){
-        stargazersRepo.setInitTupShown()
-    }
+    fun setInitTipShown() = stargazersRepo.setInitTupShown()
 
     companion object{
         private const val TAG = "StargazersListViewModel"
-        const val SWITCH_TO_HPB_DELAY = 1_500L
     }
 }
 
-class StargazersListViewModelFactory(private val stargazersRepo: StargazersRepo) : ViewModelProvider.Factory {
+class StargazersListViewModelFactory(private val stargazersRepo: StargazersRepo,
+                                     private val  app: StargazersApp) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(StargazersListViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return StargazersListViewModel(stargazersRepo) as T
+            return StargazersListViewModel(stargazersRepo, app) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

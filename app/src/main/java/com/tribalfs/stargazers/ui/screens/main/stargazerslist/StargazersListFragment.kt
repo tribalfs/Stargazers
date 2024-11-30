@@ -3,6 +3,7 @@ package com.tribalfs.stargazers.ui.screens.main.stargazerslist
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -22,10 +23,11 @@ import androidx.recyclerview.widget.ItemTouchHelper.START
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tribalfs.stargazers.R
+import com.tribalfs.stargazers.app.StargazersApp
 import com.tribalfs.stargazers.data.StargazersRepo
+import com.tribalfs.stargazers.data.model.FetchState
 import com.tribalfs.stargazers.databinding.FragmentStargazersListBinding
 import com.tribalfs.stargazers.ui.core.util.SharingUtils.share
-import com.tribalfs.stargazers.ui.core.util.isOnline
 import com.tribalfs.stargazers.ui.core.util.launchAndRepeatWithViewLifecycle
 import com.tribalfs.stargazers.ui.core.util.openUrl
 import com.tribalfs.stargazers.ui.core.util.seslSetFastScrollerEnabledForApi24
@@ -33,8 +35,6 @@ import com.tribalfs.stargazers.ui.core.view.TouchBlockingView
 import com.tribalfs.stargazers.ui.screens.main.MainActivity
 import com.tribalfs.stargazers.ui.screens.main.MainActivity.Companion.KEY_REPO_NAME
 import com.tribalfs.stargazers.ui.screens.main.core.base.AbsBaseFragment
-import com.tribalfs.stargazers.ui.screens.main.stargazerslist.StargazersListViewModel.Companion.SWITCH_TO_HPB_DELAY
-import com.tribalfs.stargazers.ui.screens.main.stargazerslist.StargazersListViewModel.LoadState
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.adapter.StargazersAdapter
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.model.StargazersListItemUiModel
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.util.updateIndexer
@@ -111,9 +111,8 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                     },
                     subHeaderRule = ItemDecorRule.SELECTED{
                         it.itemViewType == StargazersListItemUiModel.SeparatorItem.VIEW_TYPE
-                    }).apply {
-                    setDividerInsetStart(78.dpToPx(resources))
-                }
+                    }
+                ).apply { setDividerInsetStart(78.dpToPx(resources)) }
             )
             setItemAnimator(null)
             enableCoreSeslFeatures(fastScrollerEnabled = false)
@@ -154,25 +153,23 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
 
     private fun configureSwipeRefresh() {
         binding.swiperefreshView.apply {
-            seslSetRefreshOnce(true)
             setOnRefreshListener {
                 stargazersViewModel.refreshStargazers()
                 viewLifecycleOwner.lifecycleScope.launch {
                     delay(SWITCH_TO_HPB_DELAY)
+                    isRefreshing = false
                     //We are switching to less intrusive horizontal progress bar
                     //if refreshing is not yet completed at this moment
-                    isRefreshing = false
+                    if (stargazersViewModel.stargazersListScreenStateFlow.value.fetchStatus == FetchState.REFRESHING) {
+                        binding.horizontalPb.isVisible = true
+                    }
                 }
             }
         }
 
         binding.retryBtn.apply {
             setOnClickListener {
-                if (!isOnline(requireContext())) {
-                    Snackbar.make(this, "No internet connection detected.", Snackbar.LENGTH_SHORT)
-                        .show()
-                }
-                stargazersViewModel.refreshStargazers(true)
+                stargazersViewModel.refreshStargazers()
             }
         }
     }
@@ -180,7 +177,8 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
 
     private fun observeUIState() {
         val stargazersRepo = StargazersRepo.getInstance(requireContext())
-        val viewModelFactory = StargazersListViewModelFactory(stargazersRepo)
+        val viewModelFactory = StargazersListViewModelFactory(
+            stargazersRepo, requireContext().applicationContext as StargazersApp)
 
         stargazersViewModel =
             ViewModelProvider(this, viewModelFactory)[StargazersListViewModel::class.java]
@@ -191,7 +189,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                     .collectLatest {
                         val itemsList = it.itemsList
 
-                        updateLoadStateViews(it.loadState, itemsList.isEmpty())
+                        updateLoadingStateViews(it.fetchStatus, itemsList.isEmpty())
                         stargazersAdapter.submitList(itemsList)
 
                         if (itemsList.isNotEmpty()) {
@@ -222,7 +220,8 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                                 (System.currentTimeMillis() - it.lastRefresh) > 1000*60*60*15
 
                         if (shouldAutoRefresh){
-                            stargazersViewModel.refreshStargazers(true)
+                            //Just do it silently
+                            stargazersViewModel.refreshStargazers(false)
                         }
 
                         if (!it.initTipShown){
@@ -230,41 +229,48 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                         }
                     }
             }
+
+            launch {
+                stargazersViewModel.userMessage
+                    .collect{
+                        if (it != null){
+                            Snackbar.make(requireActivity().window.decorView, it, Snackbar.LENGTH_SHORT).show()
+                            stargazersViewModel.setUserMessageShown()
+                        }
+                    }
+            }
         }
     }
 
-    private var lastStateReceived: LoadState? = null
+    private var lastStateReceived: FetchState? = null
 
-    private fun updateLoadStateViews(loadState: LoadState, isEmpty: Boolean) {
+    private fun updateLoadingStateViews(loadState: FetchState, isEmpty: Boolean) {
+        Log.d(TAG, "updateLoadingStateViews: $loadState")
         if (lastStateReceived == loadState) return
         lastStateReceived = loadState
 
         when (loadState) {
-            LoadState.LOADING -> {
+            FetchState.NOT_INIT -> Unit
+            FetchState.INITING -> {
                 binding.loadingPb.isVisible = true
-                binding.horizontalPb.isVisible = false
-                binding.retryBtn.isVisible = false
             }
-
-            LoadState.REFRESHING -> {
-                binding.loadingPb.isVisible = false
-                binding.horizontalPb.isVisible = true
-                binding.retryBtn.isVisible = false
-
-            }
-
-            LoadState.LOADED ->{
-                binding.loadingPb.isVisible = false
-                binding.horizontalPb.isVisible = false
-            }
-
-            LoadState.ERROR -> {
+            FetchState.INIT_ERROR,
+            FetchState.REFRESH_ERROR -> {
                 binding.loadingPb.isVisible = false
                 binding.horizontalPb.isVisible = false
                 binding.retryBtn.isVisible = isEmpty
-                if (!isEmpty){
-                    Snackbar.make(requireActivity().window.decorView, "Error loading stargazers.", Snackbar.LENGTH_SHORT).show()
-                }
+            }
+            FetchState.INITED,
+            FetchState.REFRESHED -> {
+                binding.loadingPb.isVisible = false
+                binding.horizontalPb.isVisible = false
+                binding.retryBtn.isVisible = false
+            }
+            FetchState.REFRESHING -> {
+               // binding.loadingPb.isVisible = false
+                // binding.horizontalPb.isVisible = true
+                binding.retryBtn.isVisible = false
+
             }
         }
     }
@@ -478,5 +484,6 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
 
     companion object {
         private const val TAG = "StargazersListFragment"
+        const val SWITCH_TO_HPB_DELAY = 1_500L
     }
 }

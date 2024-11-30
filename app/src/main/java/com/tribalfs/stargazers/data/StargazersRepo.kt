@@ -8,17 +8,27 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.tribalfs.stargazers.data.local.StargazersDB
 import com.tribalfs.stargazers.data.local.datastore.PreferenceDataStoreImpl
+import com.tribalfs.stargazers.data.model.FetchState
+import com.tribalfs.stargazers.data.model.FetchState.INITED
+import com.tribalfs.stargazers.data.model.FetchState.INITING
+import com.tribalfs.stargazers.data.model.FetchState.INIT_ERROR
+import com.tribalfs.stargazers.data.model.FetchState.NOT_INIT
+import com.tribalfs.stargazers.data.model.FetchState.REFRESHED
+import com.tribalfs.stargazers.data.model.FetchState.REFRESHING
+import com.tribalfs.stargazers.data.model.FetchState.REFRESH_ERROR
 import com.tribalfs.stargazers.data.model.Stargazer
 import com.tribalfs.stargazers.data.model.StargazersSettings
 import com.tribalfs.stargazers.data.network.NetworkDataSource
 import com.tribalfs.stargazers.data.network.Update
 import com.tribalfs.stargazers.data.network.UpdateDataSource
 import com.tribalfs.stargazers.data.util.determineDarkMode
+import com.tribalfs.stargazers.data.util.toFetchStatus
 import com.tribalfs.stargazers.data.util.toSearchModeOnActionMode
 import com.tribalfs.stargazers.data.util.toSearchModeOnBackBehavior
 import dev.oneuiproject.oneui.layout.AppInfoLayout.UPDATE_AVAILABLE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -32,21 +42,46 @@ class StargazersRepo private constructor(context: Context) {
 
     val stargazersFlow: Flow<List<Stargazer>> = database.stargazerDao().getAllStargazers()
 
-    suspend fun refreshStargazers(onRefreshComplete: (isSuccess: Boolean) -> Unit) =
+    suspend fun refreshStargazers(onRefreshComplete: ((isSuccess: Boolean, exception: Exception?) -> Unit)? = null) =
         withContext(Dispatchers.IO) {
             try {
-                NetworkDataSource.fetchStargazers()?.let {
-                    database.stargazerDao().replaceAll(it)
+                setOnStartFetchStatus()
+                val stargazers = NetworkDataSource.fetchStargazers()
+                if (stargazers != null){
+                    database.stargazerDao().replaceAll(stargazers)
                     updateLastRefresh(System.currentTimeMillis())
-                    onRefreshComplete(true)
-                } ?: run {
-                    onRefreshComplete(false)
+                    setOnFinishFetchStatus(true)
+                    onRefreshComplete?.invoke(true, null)
+                } else {
+                    setOnFinishFetchStatus(false)
+                    onRefreshComplete?.invoke(false, null)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                onRefreshComplete(false)
+                setOnFinishFetchStatus(false)
+                onRefreshComplete?.invoke(false, e)
             }
         }
+
+    private suspend fun setOnStartFetchStatus(){
+        when(fetchStatusFlow.first()){
+            NOT_INIT,
+            INIT_ERROR,
+            INITING -> setFetchStatus(INITING)
+            INITED,
+            REFRESH_ERROR,
+            REFRESHED,
+            REFRESHING -> setFetchStatus(REFRESHING)
+        }
+    }
+
+    private suspend fun setOnFinishFetchStatus(isSuccess: Boolean){
+        when(fetchStatusFlow.first()){
+            REFRESHING -> setFetchStatus(if (isSuccess) REFRESHED else REFRESH_ERROR)
+            INITING ->  setFetchStatus(if (isSuccess) INITED else INIT_ERROR)
+            else -> Unit//we're not expecting this
+        }
+    }
 
     fun updateLastRefresh(timeMillis: Long) = prefDataStoreImpl.putLong(PREF_LAST_REFRESH.name, timeMillis)
 
@@ -75,8 +110,11 @@ class StargazersRepo private constructor(context: Context) {
         prefDataStoreImpl.putBoolean(PREF_UPDATE_AVAILABLE.name, it.status == UPDATE_AVAILABLE)
     }
 
-    suspend fun getStargazersById(ids: IntArray): List<Stargazer> =
-        database.stargazerDao().getStargazersById(ids)
+    suspend fun getStargazersById(ids: IntArray) = database.stargazerDao().getStargazersById(ids)
+
+    val fetchStatusFlow = dataStore.data.map{ it[PREF_INIT_FETCH_STATE].toFetchStatus() }
+
+    fun setFetchStatus(state: FetchState) = prefDataStoreImpl.putInt(PREF_INIT_FETCH_STATE.name, state.ordinal)
 
     companion object {
         @Volatile
@@ -103,5 +141,6 @@ class StargazersRepo private constructor(context: Context) {
         val PREF_LAST_REFRESH = longPreferencesKey("lastRefresh")
         val PREF_UPDATE_AVAILABLE = booleanPreferencesKey("updateAvailable")
         private val PREF_INIT_TIP_SHOWN = booleanPreferencesKey("initTipShown")
+        private val PREF_INIT_FETCH_STATE = intPreferencesKey("initFetch")
     }
 }
