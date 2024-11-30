@@ -7,15 +7,20 @@ import com.tribalfs.stargazers.data.StargazersRepo
 import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 
 class MainViewModel (
-    stargazersRepo: StargazersRepo
+    private val stargazersRepo: StargazersRepo
 ): ViewModel() {
 
-    val stargazerSettingsStateFlow = stargazersRepo.stargazersSettingsFlow.map {
+    val updateAvailableStateFlow = stargazersRepo.stargazersSettingsFlow.map {
         it.updateAvailable
     }.stateIn(viewModelScope, Lazily, false)
+
+    fun checkUpdate() =viewModelScope.launch {
+        stargazersRepo.getUpdate()
+    }
 }
 
 

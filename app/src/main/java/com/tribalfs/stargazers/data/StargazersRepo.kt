@@ -13,10 +13,10 @@ import com.tribalfs.stargazers.data.model.StargazersSettings
 import com.tribalfs.stargazers.data.network.NetworkDataSource
 import com.tribalfs.stargazers.data.network.Update
 import com.tribalfs.stargazers.data.network.UpdateDataSource
-import dev.oneuiproject.oneui.layout.AppInfoLayout
 import com.tribalfs.stargazers.data.util.determineDarkMode
 import com.tribalfs.stargazers.data.util.toSearchModeOnActionMode
 import com.tribalfs.stargazers.data.util.toSearchModeOnBackBehavior
+import dev.oneuiproject.oneui.layout.AppInfoLayout.UPDATE_AVAILABLE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -71,10 +71,8 @@ class StargazersRepo private constructor(context: Context) {
 
     fun setInitTupShown() = prefDataStoreImpl.putBoolean(PREF_INIT_TIP_SHOWN.name, true)
 
-    suspend fun getUpdate(): Update{
-        return UpdateDataSource.getUpdate().also {
-            prefDataStoreImpl.putBoolean(PREF_UPDATE_AVAILABLE.name, it.status == AppInfoLayout.UPDATE_AVAILABLE)
-        }
+    suspend fun getUpdate(): Update = UpdateDataSource.getUpdate().also {
+        prefDataStoreImpl.putBoolean(PREF_UPDATE_AVAILABLE.name, it.status == UPDATE_AVAILABLE)
     }
 
     suspend fun getStargazersById(ids: IntArray): List<Stargazer> =

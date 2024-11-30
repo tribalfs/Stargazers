@@ -10,13 +10,12 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.tribalfs.stargazers.R
 import com.tribalfs.stargazers.data.StargazersRepo
 import com.tribalfs.stargazers.databinding.ActivityMainBinding
+import com.tribalfs.stargazers.ui.core.util.launchAndRepeatWithLifecycle
 import com.tribalfs.stargazers.ui.screens.customabout.CustomAboutActivity
 import com.tribalfs.stargazers.ui.screens.main.core.navigation.AppNavigation
 import com.tribalfs.stargazers.ui.screens.main.core.navigation.MainNavigationDelegate
@@ -26,7 +25,6 @@ import dev.oneuiproject.oneui.layout.Badge
 import dev.oneuiproject.oneui.layout.DrawerLayout
 import dev.oneuiproject.oneui.utils.ActivityUtils
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 //TODO/s:
 // 1. navigate using navigation lib ✔
@@ -52,12 +50,14 @@ class MainActivity : AppCompatActivity(),
 
         initViewModel()
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mainViewModel.stargazerSettingsStateFlow.collectLatest {
-                    settingsMenuItem?.setBadge(if (it) Badge.DOT else Badge.NONE)
-                }
+        launchAndRepeatWithLifecycle(Lifecycle.State.RESUMED){
+            mainViewModel.updateAvailableStateFlow.collectLatest {
+                settingsMenuItem?.setBadge(if (it) Badge.DOT else Badge.NONE)
             }
+        }
+
+        if (savedInstanceState == null) {
+            mainViewModel.checkUpdate()
         }
     }
 
