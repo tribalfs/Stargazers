@@ -3,7 +3,7 @@ package com.tribalfs.stargazers.data.model
 import androidx.annotation.Keep
 
 @Keep
-data class Release(
+data class Tags(
     @JvmField
-    val tag_name: String
+    val name: String
 )

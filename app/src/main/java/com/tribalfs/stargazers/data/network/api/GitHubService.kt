@@ -2,7 +2,7 @@ package com.tribalfs.stargazers.data.network.api
 
 import com.tribalfs.stargazers.data.model.Stargazer
 import com.tribalfs.stargazers.data.model.StargazerDetails
-import com.tribalfs.stargazers.data.model.Release
+import com.tribalfs.stargazers.data.model.Tags
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -19,10 +19,10 @@ interface GitHubService {
         @Path("username") username: String
     ): StargazerDetails
 
-    @GET("repos/{owner}/{repo}/releases/latest")
-    fun getLatestRelease(
+    @GET("repos/{owner}/{repo}/tags")
+    fun getTags(
         @Path("owner") owner: String,
         @Path("repo") repo: String
-    ): Call<Release>
+    ): Call<List<Tags>>
 }
 
