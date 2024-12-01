@@ -19,6 +19,7 @@ import com.tribalfs.stargazers.data.model.FetchState.REFRESH_ERROR
 import com.tribalfs.stargazers.data.model.Stargazer
 import com.tribalfs.stargazers.data.model.StargazersSettings
 import com.tribalfs.stargazers.data.network.NetworkDataSource
+import com.tribalfs.stargazers.data.network.ApiResult
 import com.tribalfs.stargazers.data.network.Update
 import com.tribalfs.stargazers.data.network.UpdateDataSource
 import com.tribalfs.stargazers.data.util.determineDarkMode
@@ -27,13 +28,24 @@ import com.tribalfs.stargazers.data.util.getEffectiveHighlightColor
 import com.tribalfs.stargazers.data.util.toSearchModeOnActionMode
 import com.tribalfs.stargazers.data.util.toSearchModeOnBackBehavior
 import dev.oneuiproject.oneui.layout.AppInfoLayout.UPDATE_AVAILABLE
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import kotlin.coroutines.CoroutineContext
+
+sealed class RefreshResult{
+    object Updated : RefreshResult()
+    object UpdateRunning : RefreshResult()
+    object NetworkException : RefreshResult()
+    data class OtherException(val exception: Exception) : RefreshResult()
+}
 
 class StargazersRepo private constructor(
     context: Context,
@@ -48,25 +60,32 @@ class StargazersRepo private constructor(
 
     val stargazersFlow: Flow<List<Stargazer>> = database.stargazerDao().getAllStargazers()
 
-    suspend fun refreshStargazers(onRefreshComplete: ((isSuccess: Boolean, exception: Exception?) -> Unit)? = null) =
+    private val refreshMutex = Mutex()
+
+    suspend fun refreshStargazers(callback: ((result: RefreshResult) -> Unit)? = null) =
         withContext(Dispatchers.IO) {
-            try {
-                setOnStartFetchStatus()
-                val stargazers = NetworkDataSource.fetchStargazers()
-                if (stargazers != null){
-                    database.stargazerDao().replaceAll(stargazers)
+            if (!refreshMutex.tryLock()) {
+                callback?.invoke(RefreshResult.UpdateRunning)
+                return@withContext
+            }
+
+            setOnStartFetchStatus()
+            when (val result = NetworkDataSource.fetchStargazers()){
+                is ApiResult.Success -> {
+                    database.stargazerDao().replaceAll(result.data)
                     updateLastRefresh(System.currentTimeMillis())
                     setOnFinishFetchStatus(true)
-                    onRefreshComplete?.invoke(true, null)
-                } else {
-                    setOnFinishFetchStatus(false)
-                    onRefreshComplete?.invoke(false, null)
+                    callback?.invoke(RefreshResult.Updated)
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                setOnFinishFetchStatus(false)
-                onRefreshComplete?.invoke(false, e)
+                is ApiResult.Failure -> {
+                    setOnFinishFetchStatus(false)
+                    when(result.e){
+                        is HttpException -> callback?.invoke(RefreshResult.NetworkException)
+                        else -> callback?.invoke(RefreshResult.OtherException(result.e))
+                    }
+                }
             }
+            refreshMutex.unlock()
         }
 
     val fetchStatusFlow: Flow<FetchState> = dataStore.data.map { it[PREF_INIT_FETCH_STATE].toFetchStatus() }
@@ -160,5 +179,7 @@ class StargazersRepo private constructor(
         val PREF_UPDATE_AVAILABLE = booleanPreferencesKey("updateAvailable")
         private val PREF_INIT_TIP_SHOWN = booleanPreferencesKey("initTipShown")
         private val PREF_INIT_FETCH_STATE = intPreferencesKey("initFetch")
+
+        private const val TAG = "StargazersRepo"
     }
 }

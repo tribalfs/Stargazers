@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.tribalfs.stargazers.app.StargazersApp
+import com.tribalfs.stargazers.data.RefreshResult
 import com.tribalfs.stargazers.data.StargazersRepo
 import com.tribalfs.stargazers.data.model.FetchState
 import com.tribalfs.stargazers.data.model.SearchModeOnActionMode
@@ -94,12 +95,21 @@ class StargazersListViewModel (
             return@launch
         }
 
-        stargazersRepo.refreshStargazers sr@{ success, e ->
+        stargazersRepo.refreshStargazers sr@{ result ->
             if (!notifyResult) return@sr
-            if (success){
-                _userMessage.update {  "Latest stargazers data successfully fetched!" }
-            }else{
-                _userMessage.update {  e?.message ?: "Error fetching stargazers." }
+            when (result){
+                RefreshResult.UpdateRunning -> {
+                    _userMessage.update { "Stargazer's already refreshing." }
+                }
+                is RefreshResult.OtherException -> {
+                    _userMessage.update {  result.exception.message ?: "Error fetching stargazers." }
+                }
+                RefreshResult.Updated -> {
+                    _userMessage.update {  "Latest stargazers data successfully fetched!" }
+                }
+                RefreshResult.NetworkException -> {
+                    _userMessage.update {  "Connection error occurred!" }
+                }
             }
         }
 
