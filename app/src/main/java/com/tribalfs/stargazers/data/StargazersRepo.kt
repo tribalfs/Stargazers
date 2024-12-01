@@ -32,11 +32,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import kotlin.coroutines.CoroutineContext
 
-class StargazersRepo private constructor(context: Context) {
+class StargazersRepo private constructor(
+    context: Context,
+    override val coroutineContext: CoroutineContext = Dispatchers.IO + SupervisorJob()
+): CoroutineScope {
 
     private val appContext = context.applicationContext
-    private val database = StargazersDB.getDatabase(appContext)
+    private val database = StargazersDB.getDatabase(appContext, this)
 
     private val prefDataStoreImpl = PreferenceDataStoreImpl.getInstance(appContext)
     private val dataStore = prefDataStoreImpl.dataStore
@@ -64,24 +69,37 @@ class StargazersRepo private constructor(context: Context) {
             }
         }
 
-    private suspend fun setOnStartFetchStatus(){
-        when(fetchStatusFlow.first()){
-            NOT_INIT,
-            INIT_ERROR,
-            INITING -> setFetchStatus(INITING)
-            INITED,
-            REFRESH_ERROR,
-            REFRESHED,
-            REFRESHING -> setFetchStatus(REFRESHING)
+    val fetchStatusFlow: Flow<FetchState> = dataStore.data.map { it[PREF_INIT_FETCH_STATE].toFetchStatus() }
+
+    // Use in-memory cache for local check;
+    // we can't rely on asynchronous flow value
+    private var fetchStatusCache: FetchState = NOT_INIT
+
+    init {
+        launch {
+            fetchStatusCache = fetchStatusFlow.first()
         }
     }
 
-    private suspend fun setOnFinishFetchStatus(isSuccess: Boolean){
-        when(fetchStatusFlow.first()){
+    private fun setOnStartFetchStatus() {
+        when (fetchStatusCache) {
+            NOT_INIT, INIT_ERROR -> setFetchStatus(INITING)
+            INITED, REFRESH_ERROR, REFRESHED -> setFetchStatus(REFRESHING)
+            INITING, REFRESHING -> Unit
+        }
+    }
+
+    private fun setOnFinishFetchStatus(isSuccess: Boolean) {
+        when (fetchStatusCache) {
             REFRESHING -> setFetchStatus(if (isSuccess) REFRESHED else REFRESH_ERROR)
-            INITING ->  setFetchStatus(if (isSuccess) INITED else INIT_ERROR)
+            INITING -> setFetchStatus(if (isSuccess) INITED else INIT_ERROR)
             else -> Unit//we're not expecting this
         }
+    }
+
+    fun setFetchStatus(state: FetchState) {
+        fetchStatusCache = state
+        prefDataStoreImpl.putInt(PREF_INIT_FETCH_STATE.name, state.ordinal)
     }
 
     fun updateLastRefresh(timeMillis: Long) = prefDataStoreImpl.putLong(PREF_LAST_REFRESH.name, timeMillis)
@@ -114,10 +132,6 @@ class StargazersRepo private constructor(context: Context) {
     }
 
     suspend fun getStargazersById(ids: IntArray) = database.stargazerDao().getStargazersById(ids)
-
-    val fetchStatusFlow = dataStore.data.map{ it[PREF_INIT_FETCH_STATE].toFetchStatus() }
-
-    fun setFetchStatus(state: FetchState) = prefDataStoreImpl.putInt(PREF_INIT_FETCH_STATE.name, state.ordinal)
 
     companion object {
         @Volatile
