@@ -19,7 +19,6 @@ import com.tribalfs.stargazers.data.model.FetchState.REFRESH_ERROR
 import com.tribalfs.stargazers.data.model.Stargazer
 import com.tribalfs.stargazers.data.model.StargazersSettings
 import com.tribalfs.stargazers.data.network.NetworkDataSource
-import com.tribalfs.stargazers.data.network.ApiResult
 import com.tribalfs.stargazers.data.network.Update
 import com.tribalfs.stargazers.data.network.UpdateDataSource
 import com.tribalfs.stargazers.data.util.determineDarkMode
@@ -44,7 +43,7 @@ sealed class RefreshResult{
     object Updated : RefreshResult()
     object UpdateRunning : RefreshResult()
     object NetworkException : RefreshResult()
-    data class OtherException(val exception: Exception) : RefreshResult()
+    data class OtherException(val exception: Throwable) : RefreshResult()
 }
 
 class StargazersRepo private constructor(
@@ -70,21 +69,21 @@ class StargazersRepo private constructor(
             }
 
             setOnStartFetchStatus()
-            when (val result = NetworkDataSource.fetchStargazers()){
-                is ApiResult.Success -> {
-                    database.stargazerDao().replaceAll(result.data)
+            NetworkDataSource.fetchStargazers()
+                .onSuccess {
+                    database.stargazerDao().replaceAll(it)
                     updateLastRefresh(System.currentTimeMillis())
                     setOnFinishFetchStatus(true)
                     callback?.invoke(RefreshResult.Updated)
                 }
-                is ApiResult.Failure -> {
+                .onFailure {
                     setOnFinishFetchStatus(false)
-                    when(result.e){
+                    when(it){
                         is HttpException -> callback?.invoke(RefreshResult.NetworkException)
-                        else -> callback?.invoke(RefreshResult.OtherException(result.e))
+                        else -> callback?.invoke(RefreshResult.OtherException(it))
                     }
                 }
-            }
+
             refreshMutex.unlock()
         }
 

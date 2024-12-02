@@ -7,21 +7,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 
-sealed class ApiResult<out T> {
-    data class Success<out T>(val data: T) : ApiResult<T>()
-    data class Failure(val e: Exception) : ApiResult<Nothing>()
-}
-
 object NetworkDataSource {
 
-    suspend fun fetchStargazers(): ApiResult<List<Stargazer>>  {
-        return try {
-            val stargazers = getStargazers()
-            ApiResult.Success(stargazers)
-        } catch (e: Exception) {
-            ApiResult.Failure(e)
-        }
-    }
+    suspend fun fetchStargazers(): Result<List<Stargazer>> = runCatching { getStargazers() }
 
     private suspend fun getStargazers() = withContext(Dispatchers.IO){
         val repoList = listOf(
