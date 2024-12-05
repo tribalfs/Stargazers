@@ -28,12 +28,8 @@ import com.tribalfs.stargazers.ui.screens.main.stargazerslist.model.StargazersLi
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.model.StargazersListItemUiModel.SeparatorItem
 import dev.oneuiproject.oneui.widget.SelectableLinearLayout
 
-class StargazersAdapter (
-    private val context: Context
-) : RecyclerView.Adapter<StargazersAdapter.ViewHolder>(),
-
+class StargazersAdapter (context: Context): RecyclerView.Adapter<StargazersAdapter.ViewHolder>(),
     MultiSelector<Long> by MultiSelectorDelegate(isSelectable = { it != SeparatorItem.VIEW_TYPE }),
-
     SemSectionIndexer<StargazersListItemUiModel> by SectionIndexerDelegate(context, labelExtractor = { getLabel(it) }) {
 
     init {

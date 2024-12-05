@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ThemeMetaData FormatVersion="1.3" GuideVersion="1.4">
-    <AppMetaData Name="Stargazers" TargetApi="21" TargetPackageName="com.tribalfs.stargazers" VersionCode="1" VersionName="">
+<ThemeMetaData
+    FormatVersion="1.3"
+    GuideVersion="1.4">
+    <AppMetaData
+        Name="Stargazers"
+        TargetApi="21"
+        TargetPackageName="com.tribalfs.stargazers"
+        VersionCode="1"
+        VersionName="">
         <Include RefName="SESL" />
+
         <Property
             Comment="FAB : BG tint color"
             DefaultValue="#ff57b2d4"
@@ -9,7 +17,24 @@
             DestQualifiers=""
             UID="13-5-5"
             ValueRef="1-8-1"
-            ValueType="BgColor"/>
+            ValueType="BgColor" />
+
+        <Property
+            Comment="drawer background color for tablet"
+            DefaultValue="#eaeaea"
+            DestAttribName="drawer_background_tablet_color"
+            UID="62-20-8-1"
+            ValueRef="1-7-1"
+            ValueType="BgColor" />
+
+        <Property
+            Comment="drawer selected background color"
+            DefaultValue="#0d000000"
+            DestAttribName="color_drawer_list_item_background"
+            Opacity="20"
+            UID="62-20-2-2"
+            ValueRef="1-3-1"
+            ValueType="BgColor" />
 
     </AppMetaData>
 </ThemeMetaData>

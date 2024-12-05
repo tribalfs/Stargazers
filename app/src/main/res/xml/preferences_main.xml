@@ -62,6 +62,11 @@
             android:key="filterMode"
             android:title="Filter mode"
             android:defaultValue="true" />-->
+        <SwitchPreferenceCompat
+            android:disableDependentsState="false"
+            android:key="lockDrawerNavRailSearchMode"
+            android:title="Lock nav rail"
+            android:defaultValue="false" />-->
 
         <SwitchPreferenceCompat
             android:disableDependentsState="false"
@@ -78,6 +83,15 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Action mode">
+        <SwitchPreferenceCompat
+            android:disableDependentsState="false"
+            android:key="lockDrawerNavRailActionMode"
+            android:title="Lock nav rail"
+            android:defaultValue="false" />
+
+    </PreferenceCategory>
     <PreferenceCategory>
         <Preference
             android:key="about"

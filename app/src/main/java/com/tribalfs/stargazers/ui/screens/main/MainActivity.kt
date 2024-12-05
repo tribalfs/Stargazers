@@ -22,7 +22,7 @@ import com.tribalfs.stargazers.ui.screens.main.core.navigation.MainNavigationDel
 import com.tribalfs.stargazers.ui.screens.settings.SettingsActivity
 import dev.oneuiproject.oneui.ktx.setBadge
 import dev.oneuiproject.oneui.layout.Badge
-import dev.oneuiproject.oneui.layout.DrawerLayout
+import dev.oneuiproject.oneui.layout.NavDrawerLayout
 import dev.oneuiproject.oneui.utils.ActivityUtils
 import kotlinx.coroutines.flow.collectLatest
 
@@ -63,12 +63,15 @@ class MainActivity : AppCompatActivity(),
 
     private fun setupNavigation() {
         mBinding.drawerLayout.apply {
-            setDrawerButtonIcon(ResourcesCompat.getDrawable(resources,
-                dev.oneuiproject.oneui.R.drawable.ic_oui_info_outline, theme))
-            setDrawerButtonTooltip("App info")
-            setDrawerButtonOnClickListener {
+            setHeaderButtonIcon(
+                ResourcesCompat.getDrawable(resources,
+                dev.oneuiproject.oneui.R.drawable.ic_oui_info_outline, theme)
+            )
+            setHeaderButtonTooltip("App info")
+            setHeaderButtonOnClickListener {
                 startActivity(Intent(this@MainActivity, CustomAboutActivity::class.java))
             }
+            setNavRailContentMinSideMargin(14)
         }
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_main) as NavHostFragment
@@ -106,7 +109,7 @@ class MainActivity : AppCompatActivity(),
 
     private val isRTL: Boolean get() = resources.configuration.layoutDirection == LayoutDirection.RTL
 
-    val drawerLayout: DrawerLayout get() = mBinding.drawerLayout
+    val drawerLayout: NavDrawerLayout get() = mBinding.drawerLayout
 
     companion object{
         const val KEY_REPO_NAME = "repoName"

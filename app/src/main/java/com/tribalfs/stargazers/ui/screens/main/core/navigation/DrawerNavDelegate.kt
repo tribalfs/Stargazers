@@ -9,13 +9,21 @@ import androidx.navigation.NavOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tribalfs.stargazers.R
+import com.tribalfs.stargazers.ui.core.util.getRandomOUIDrawableId
 import com.tribalfs.stargazers.ui.core.util.toast
 import com.tribalfs.stargazers.ui.screens.main.MainActivity.Companion.KEY_REPO_NAME
 import dev.oneuiproject.oneui.layout.DrawerLayout
+import dev.oneuiproject.oneui.layout.NavDrawerLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class MainNavigationDelegate: AppNavigation {
     private lateinit var mAdapter: DrawerNavAdapter
-    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var drawerLayout: NavDrawerLayout
 
     override fun onDestinationChanged(
         controller: NavController,
@@ -26,7 +34,13 @@ class MainNavigationDelegate: AppNavigation {
         drawerLayout.apply {
             setCollapsedSubtitle(destination.label)
             setExpandedSubtitle(destination.label)
-            post { setDrawerOpen(false, animate = true) }
+            endActionMode()
+            endSearchMode()
+            if (isLargeScreenMode){
+                closeNavRailOnBack = destination.id == controller.graph.startDestinationId
+            }else{
+                post { setDrawerOpen(false, animate = true) }
+            }
         }
     }
 
@@ -47,7 +61,7 @@ class MainNavigationDelegate: AppNavigation {
             else ->  bundleOf(KEY_REPO_NAME to "")
         }
 
-    override fun initNavigation(drawerLayout: DrawerLayout, drawerListView: RecyclerView, navController: NavController) {
+    override fun initNavigation(drawerLayout: NavDrawerLayout, drawerListView: RecyclerView, navController: NavController) {
         this.drawerLayout = drawerLayout
 
         val navGraph = navController.graph
@@ -71,6 +85,46 @@ class MainNavigationDelegate: AppNavigation {
         }
 
         navController.addOnDestinationChangedListener (this)
+
+       setupNavRailFadeEffect()
+    }
+
+    private fun setupNavRailFadeEffect(){
+        drawerLayout.apply {
+            if (!isLargeScreenMode) return
+            setDrawerStateListener {
+                when(it){
+                    DrawerLayout.DrawerState.OPEN -> {
+                        offsetUpdaterJob?.cancel()
+                        mAdapter.updateOffset(1f)
+                    }
+                    DrawerLayout.DrawerState.CLOSE-> {
+                        offsetUpdaterJob?.cancel()
+                        mAdapter.updateOffset(0f)
+                    }
+
+                    DrawerLayout.DrawerState.CLOSING,
+                    DrawerLayout.DrawerState.OPENING -> {
+                        startOffsetUpdater()
+                    }
+                }
+            }
+        }
+
+        //Set initial offset
+        drawerLayout.post {
+            mAdapter.updateOffset(drawerLayout.drawerOffset)
+        }
+    }
+
+    private var offsetUpdaterJob: Job? = null
+    private fun startOffsetUpdater(){
+        offsetUpdaterJob = CoroutineScope(Dispatchers.Main).launch {
+            while(isActive) {
+                mAdapter.updateOffset(drawerLayout.drawerOffset)
+                delay(50)
+            }
+        }
     }
 
 
@@ -93,7 +147,7 @@ class MainNavigationDelegate: AppNavigation {
         navGraph.iterator().asSequence()
             .filter { it.id != navGraph.startDestinationId }
             .forEach { destination ->
-                val iconResId = dev.oneuiproject.oneui.R.drawable.ic_oui_creatures_outline
+                val iconResId = getRandomOUIDrawableId()
                 drawerItems.add(
                     DrawerItem.DestinationItem(
                         destination.id,
@@ -112,9 +166,11 @@ class MainNavigationDelegate: AppNavigation {
 }
 
 
+
+
 interface AppNavigation: NavController.OnDestinationChangedListener{
     fun getDrawerItems(navGraph: NavGraph): List<DrawerItem>
     fun getNavOptions(destinationId: Int, startDestinationId: Int): NavOptions
     fun getNavArguments(destinationId: Int): Bundle
-    fun initNavigation(drawerLayout: DrawerLayout, drawerListView: RecyclerView, navController: NavController)
+    fun initNavigation(drawerLayout: NavDrawerLayout, drawerListView: RecyclerView, navController: NavController)
 }

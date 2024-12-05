@@ -139,7 +139,9 @@ class StargazersRepo private constructor(
             enableIndexScroll = it[PREF_INDEXSCROLL_ENABLE] ?: true,
             lastRefresh = it[PREF_LAST_REFRESH] ?: 0,
             initTipShown = it[PREF_INIT_TIP_SHOWN] ?: false,
-            updateAvailable = it[PREF_UPDATE_AVAILABLE] ?: false
+            updateAvailable = it[PREF_UPDATE_AVAILABLE] ?: false,
+            lockNavRailSearchMode = it[PREF_LOCK_DRAWER_NAV_RAIL_SEARCH_MODE] ?: false,
+            lockNavRailActionMode = it[PREF_LOCK_DRAWER_NAV_RAIL_ACTION_MODE] ?: false
         )
     }
 
@@ -178,6 +180,8 @@ class StargazersRepo private constructor(
         val PREF_UPDATE_AVAILABLE = booleanPreferencesKey("updateAvailable")
         private val PREF_INIT_TIP_SHOWN = booleanPreferencesKey("initTipShown")
         private val PREF_INIT_FETCH_STATE = intPreferencesKey("initFetch")
+        private val PREF_LOCK_DRAWER_NAV_RAIL_ACTION_MODE = booleanPreferencesKey("lockDrawerNavRailActionMode")
+        private val PREF_LOCK_DRAWER_NAV_RAIL_SEARCH_MODE = booleanPreferencesKey("lockDrawerNavRailSearchMode")
 
         private const val TAG = "StargazersRepo"
     }
