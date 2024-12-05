@@ -93,7 +93,21 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
             arguments?.getString(KEY_REPO_NAME)?.let {
                 stargazersViewModel.setRepoFilter(it)
             }
+        }else{
+            if (savedInstanceState.getBoolean(KEY_IS_ACTION_MODE)) {
+                val selectedIds = savedInstanceState.getLongArray(KEY_ACTION_MODE_SELECTED_IDS)!!
+                launchActionMode(selectedIds.toTypedArray())
+            }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if ((requireActivity() as MainActivity).drawerLayout.isActionMode) {
+            outState.putBoolean(KEY_IS_ACTION_MODE, true)
+            outState.putLongArray(KEY_ACTION_MODE_SELECTED_IDS,
+                stargazersAdapter.getSelectedIds().asSet().toLongArray())
+        }
+        super.onSaveInstanceState(outState)
     }
 
 
@@ -485,5 +499,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
     companion object {
         private const val TAG = "StargazersListFragment"
         const val SWITCH_TO_HPB_DELAY = 1_500L
+        private const val KEY_IS_ACTION_MODE = "isActionMode"
+        private const val KEY_ACTION_MODE_SELECTED_IDS = "selectedIds"
     }
 }
