@@ -31,12 +31,12 @@ import com.tribalfs.stargazers.ui.core.util.SharingUtils.share
 import com.tribalfs.stargazers.ui.core.util.launchAndRepeatWithViewLifecycle
 import com.tribalfs.stargazers.ui.core.util.openUrl
 import com.tribalfs.stargazers.ui.core.util.seslSetFastScrollerEnabledForApi24
-import com.tribalfs.stargazers.ui.core.view.TouchBlockingView
 import com.tribalfs.stargazers.ui.screens.main.MainActivity
 import com.tribalfs.stargazers.ui.screens.main.MainActivity.Companion.KEY_REPO_NAME
 import com.tribalfs.stargazers.ui.screens.main.core.base.AbsBaseFragment
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.adapter.StargazersAdapter
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.model.StargazersListItemUiModel
+import com.tribalfs.stargazers.ui.screens.main.stargazerslist.util.showInitTip
 import com.tribalfs.stargazers.ui.screens.main.stargazerslist.util.updateIndexer
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity
 import com.tribalfs.stargazers.ui.screens.profile.ProfileActivity.Companion.KEY_STARGAZER
@@ -48,6 +48,7 @@ import dev.oneuiproject.oneui.delegates.ViewYTranslator
 import dev.oneuiproject.oneui.ktx.configureItemSwipeAnimator
 import dev.oneuiproject.oneui.ktx.dpToPx
 import dev.oneuiproject.oneui.ktx.enableCoreSeslFeatures
+import dev.oneuiproject.oneui.layout.NavDrawerLayout
 import dev.oneuiproject.oneui.layout.ToolbarLayout
 import dev.oneuiproject.oneui.layout.ToolbarLayout.SearchModeOnBackBehavior
 import dev.oneuiproject.oneui.layout.startActionMode
@@ -71,6 +72,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
     private val binding get() = _binding!!
 
     private lateinit var stargazersViewModel: StargazersListViewModel
+    private var mDrawerLayout: NavDrawerLayout? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,6 +80,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
         savedInstanceState: Bundle?
     ): View = FragmentStargazersListBinding.inflate(layoutInflater, container, false).also {
         _binding = it
+        mDrawerLayout = (requireActivity() as MainActivity).drawerLayout
         requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.STARTED)
     }.root
 
@@ -102,7 +105,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        if ((requireActivity() as MainActivity).drawerLayout.isActionMode) {
+        if (mDrawerLayout?.isActionMode == true) {
             outState.putBoolean(KEY_IS_ACTION_MODE, true)
             outState.putLongArray(KEY_ACTION_MODE_SELECTED_IDS,
                 stargazersAdapter.getSelectedIds().asSet().toLongArray())
@@ -144,7 +147,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
 
         translateYWithAppBar(
             setOf(binding.nsvNoItem, binding.loadingPb),
-            (requireActivity() as MainActivity).drawerLayout.appBarLayout,
+            mDrawerLayout!!.appBarLayout,
             this@StargazersListFragment
         )
     }
@@ -229,6 +232,11 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                         }
 
                         stargazersAdapter.searchHighlightColor = it.searchHighlightColor
+
+                        mDrawerLayout!!.apply {
+                            lockNavRailOnActionMode = it.lockNavRailActionMode
+                            lockNavRailOnSearchMode = it.lockNavRailSearchMode
+                        }
 
                         val shouldAutoRefresh = it.lastRefresh != 0L &&
                                 (System.currentTimeMillis() - it.lastRefresh) > 1000*60*60*15
@@ -352,16 +360,16 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
 
 
     private fun launchActionMode(initialSelected: Array<Long>? = null) {
-        with(requireActivity() as MainActivity) {
+
             binding.fab.isVisible = false
-            drawerLayout.startActionMode(
+            mDrawerLayout!!.startActionMode(
                 onInflateMenu = { menu ->
                     stargazersAdapter.onToggleActionMode(true, initialSelected)
                     requireActivity().menuInflater.inflate(R.menu.menu_stargazers_am, menu)
                 },
                 onEnd = {
                     stargazersAdapter.onToggleActionMode(false)
-                    binding.fab.isVisible = !drawerLayout.isSearchMode
+                    binding.fab.isVisible = !mDrawerLayout!!.isSearchMode
                 },
                 onSelectMenuItem = { it ->
                     when (it.itemId) {
@@ -373,7 +381,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                                     .let { stargazersViewModel.getStargazersById(it) }
                                     .map { it.asVCardFile(requireContext()) }
                                     .share(requireContext())
-                                drawerLayout.endActionMode()
+                                mDrawerLayout!!.endActionMode()
                             }
                             true
                         }
@@ -385,7 +393,7 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                 allSelectorStateFlow = stargazersViewModel.allSelectorStateFlow,
                 keepSearchMode = stargazersViewModel.getKeepSearchModeOnActionMode()
             )
-        }
+
     }
 
 
@@ -415,29 +423,13 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                     stargazersViewModel.setInitTipShown()
                     showInitTip(anchor, "Long-press item for multi-selection." +
                             "\nSwipe left to open github." +
-                            "\nSwipe right to open X, if available.", { })
+                            "\nSwipe right to open X, if available."
+                    ) { }
                 }
             }, 700)
         }
     }
 
-    private fun showInitTip(anchor: View, message: String,
-                            action: () -> Unit) {
-        val rootView = requireActivity().window.decorView.rootView as ViewGroup
-        val blockingView = TouchBlockingView(requireContext())
-        rootView.addView(blockingView)
-
-        TipPopup(anchor, Mode.TRANSLUCENT).apply {
-            setMessage(message)
-            setExpanded(true)
-            setOutsideTouchEnabled(false)
-            setAction("Ok") {
-                rootView.removeView(blockingView)
-                action()
-            }
-            show(Direction.DEFAULT)
-        }
-    }
 
     private fun openProfileActivity(
         vh: StargazersAdapter.ViewHolder,

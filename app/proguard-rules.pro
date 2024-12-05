@@ -21,9 +21,10 @@
 #-renamesourcefileattribute SourceFile
 
 #Prevent proguard from removing drawables from oneui-icons lib
-#-keepclassmembers class dev.oneuiproject.oneui.R$drawable {
+-keepclassmembers class dev.oneuiproject.oneui.R$drawable {
 #    public static <fields>;
-#}
+    public static int ic_oui_weather*;
+}
 
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.

@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <color name="about_page_secondary_text_color">#ff747474</color>
-
-    <color name="animated_splash_icon_color">#ffffff</color>
-
     <color name="transparent_window_bg_color">#47333333</color>
+    <color name="color_drawer_list_item_background">#2d2d30</color>
 </resources>

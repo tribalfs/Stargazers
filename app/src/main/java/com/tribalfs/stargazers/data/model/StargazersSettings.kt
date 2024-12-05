@@ -1,6 +1,5 @@
 package com.tribalfs.stargazers.data.model
 
-import android.graphics.Color
 import android.os.Parcelable
 import androidx.annotation.ColorInt
 import dev.oneuiproject.oneui.layout.ToolbarLayout.SearchModeOnBackBehavior
@@ -18,5 +17,7 @@ data class StargazersSettings(
     val enableIndexScroll: Boolean = true,
     val lastRefresh: Long = 0L,
     val initTipShown: Boolean = true,
-    val updateAvailable: Boolean = false
+    val updateAvailable: Boolean = false,
+    val lockNavRailSearchMode: Boolean = false,
+    val lockNavRailActionMode: Boolean = false
 ) : Parcelable

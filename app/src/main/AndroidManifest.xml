@@ -40,7 +40,7 @@
 
         <activity
             android:name="com.tribalfs.stargazers.ui.screens.main.MainActivity"
-            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"
+            android:configChanges="orientation|screenLayout|screenSize"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.Starting"
             android:exported="true">
@@ -63,18 +63,18 @@
         <activity
 
             android:name="com.tribalfs.stargazers.ui.screens.profile.ProfileActivity"
-            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" />
+            android:configChanges="orientation|screenLayout|screenSize" />
 
         <activity
             android:name=".ui.screens.about.AboutAppActivity" />
 
         <activity
             android:name="com.tribalfs.stargazers.ui.screens.settings.SettingsActivity"
-            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" />
+            android:configChanges="orientation|screenLayout|screenSize" />
 
         <activity
             android:name="com.tribalfs.stargazers.ui.screens.customabout.CustomAboutActivity"
-            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize" />
+            android:configChanges="orientation|screenLayout|screenSize" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

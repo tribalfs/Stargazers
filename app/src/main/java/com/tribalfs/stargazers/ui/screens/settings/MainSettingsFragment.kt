@@ -7,7 +7,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.DropDownPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
-import androidx.preference.Preference.SummaryProvider
 import androidx.preference.SeslSwitchPreferenceScreen
 import androidx.preference.SwitchPreferenceCompat
 import com.tribalfs.stargazers.R
@@ -27,6 +26,7 @@ import com.tribalfs.stargazers.ui.screens.about.AboutAppActivity
 import com.tribalfs.stargazers.ui.screens.settings.base.AbsBasePreferencesFragment
 import dev.oneuiproject.oneui.ktx.onClick
 import dev.oneuiproject.oneui.ktx.onNewValue
+import dev.oneuiproject.oneui.ktx.provideSummary
 import dev.oneuiproject.oneui.ktx.setSummaryUpdatable
 import dev.oneuiproject.oneui.ktx.showDotBadge
 import dev.oneuiproject.oneui.preference.ColorPickerPreference
@@ -78,7 +78,9 @@ class MainSettingsFragment : AbsBasePreferencesFragment(){
             onClick {
                 findNavController().navigate(R.id.to_indexscroll_preference_action)
             }
-            summaryProvider = SummaryProvider<SeslSwitchPreferenceScreen> { "Autohide  •  Show letters" }
+            provideSummary {
+                "Autohide  •  Show letters"
+            }
         }
 
         findPreference<DropDownPreference>(PREF_ACTIONMODE_SEARCH.name)!!.setSummaryUpdatable(true)
@@ -86,9 +88,8 @@ class MainSettingsFragment : AbsBasePreferencesFragment(){
         findPreference<ListPreference>(PREF_SEARCHMODE_BACK_BEHAVIOR.name)!!.setSummaryUpdatable(true)
 
         val customSearchColorPref =  findPreference<ColorPickerPreference>(PREF_SEARCH_HIGHLIGHT_COLOR.name)!!.apply {
-            setSummaryUpdatable(true)
             @OptIn(ExperimentalStdlibApi::class)
-            summaryProvider = SummaryProvider<ColorPickerPreference> {
+            provideSummary(true) {
                 "#${it.value.toHexString(HexFormat.UpperCase)}"
             }
         }

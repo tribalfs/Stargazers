@@ -1,16 +1,23 @@
 package com.tribalfs.stargazers.ui.screens.main.core.navigation
 
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.TextView
 import androidx.annotation.DrawableRes
+import androidx.annotation.FloatRange
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.tribalfs.stargazers.R
 import com.tribalfs.stargazers.ui.screens.main.core.navigation.DrawerItem.Companion.VIEW_TYPE
+import dev.oneuiproject.oneui.ktx.dpToPx
+import dev.oneuiproject.oneui.ktx.semSetToolTipText
 import dev.oneuiproject.oneui.utils.getBoldFont
 import dev.oneuiproject.oneui.utils.getNormalFont
 
@@ -44,6 +51,31 @@ class DrawerNavAdapter(
         }
     }
 
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+        } else {
+            for (payload in payloads.toSet()) {
+                when (payload) {
+                    is Payload.OFFSET -> {
+                        when (holder) {
+                            is DestinationItemViewHolder -> {
+                                holder.applyOffset(payload.slideOffset)
+                            }
+                            is ButtonViewHolder -> {
+                                holder.applyOffset(payload.slideOffset)
+                            }
+                            is DividerItemViewHolder -> {
+                                holder.applyOffset(payload.slideOffset)
+                            }
+                        }
+                    }
+                    else -> Unit
+                }
+            }
+        }
+    }
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is DestinationItemViewHolder -> {
@@ -55,6 +87,7 @@ class DrawerNavAdapter(
                     itemView.setOnClickListener {
                         mListener.onDrawerItemSelected(destination.id)
                     }
+                    itemView.semSetToolTipText(destination.title)
                 }
             }
             is DividerItemViewHolder -> Unit
@@ -75,6 +108,11 @@ class DrawerNavAdapter(
     fun setSelectedDestinationId(selectedId: Int) {
         mSelectedId = selectedId
         notifyItemRangeChanged(0, itemCount)
+    }
+
+    fun updateOffset(@FloatRange(0.0, 1.0) slideOffset: Float) {
+        Log.d("DrawerNavAdapter", "updateOffset: $slideOffset")
+        notifyItemRangeChanged(0, itemCount, Payload.OFFSET(slideOffset))
     }
 
     class DestinationItemViewHolder(itemView: View) :
@@ -103,11 +141,49 @@ class DrawerNavAdapter(
                 if (selected) TextUtils.TruncateAt.MARQUEE else TextUtils.TruncateAt.END
 
         }
+
+        fun applyOffset(offset: Float){
+            mTitleView!!.alpha = offset
+            if (offset == 0f){
+                itemView.post {
+                    itemView.updateLayoutParams<MarginLayoutParams> {
+                        width = 52f.dpToPx(itemView.context.resources)
+                    }
+                }
+            }else{
+                itemView.updateLayoutParams<MarginLayoutParams> {
+                    width = MATCH_PARENT
+                }
+            }
+        }
     }
 
-    class DividerItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    class DividerItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
 
-    class ButtonViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+        fun applyOffset(offset: Float){
+            if (offset == 0f){
+                itemView.post {
+                    itemView.updateLayoutParams<MarginLayoutParams> {
+                        width = 25f.dpToPx(itemView.context.resources)
+                    }
+                }
+            }else{
+                itemView.updateLayoutParams<MarginLayoutParams> {
+                    width = MATCH_PARENT
+                }
+            }
+        }
+    }
+
+    class ButtonViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+        private var button: AppCompatButton = itemView.findViewById(R.id.button)
+
+        fun applyOffset(offset: Float){
+            button.alpha = offset
+        }
+    }
 }
 
-
+sealed class Payload{
+    data class OFFSET(val slideOffset: Float): Payload()
+}
