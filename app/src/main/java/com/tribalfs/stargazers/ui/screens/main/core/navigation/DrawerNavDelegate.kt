@@ -34,8 +34,8 @@ class MainNavigationDelegate: AppNavigation {
         drawerLayout.apply {
             setCollapsedSubtitle(destination.label)
             setExpandedSubtitle(destination.label)
-            endActionMode()
-            endSearchMode()
+            if (isActionMode) endActionMode()
+            if (isSearchMode) endSearchMode()
             if (isLargeScreenMode){
                 closeNavRailOnBack = destination.id == controller.graph.startDestinationId
             }else{
