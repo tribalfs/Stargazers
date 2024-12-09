@@ -2,6 +2,7 @@ package com.tribalfs.stargazers.ui.screens.main.core.navigation
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import androidx.core.view.doOnLayout
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph
@@ -12,7 +13,7 @@ import com.tribalfs.stargazers.R
 import com.tribalfs.stargazers.ui.core.util.getRandomOUIDrawableId
 import com.tribalfs.stargazers.ui.core.util.toast
 import com.tribalfs.stargazers.ui.screens.main.MainActivity.Companion.KEY_REPO_NAME
-import dev.oneuiproject.oneui.layout.DrawerLayout
+import dev.oneuiproject.oneui.layout.DrawerLayout.DrawerState
 import dev.oneuiproject.oneui.layout.NavDrawerLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -94,26 +95,25 @@ class MainNavigationDelegate: AppNavigation {
             if (!isLargeScreenMode) return
             setDrawerStateListener {
                 when(it){
-                    DrawerLayout.DrawerState.OPEN -> {
+                    DrawerState.OPEN -> {
                         offsetUpdaterJob?.cancel()
                         mAdapter.updateOffset(1f)
                     }
-                    DrawerLayout.DrawerState.CLOSE-> {
+                    DrawerState.CLOSE-> {
                         offsetUpdaterJob?.cancel()
                         mAdapter.updateOffset(0f)
                     }
 
-                    DrawerLayout.DrawerState.CLOSING,
-                    DrawerLayout.DrawerState.OPENING -> {
+                    DrawerState.CLOSING,
+                    DrawerState.OPENING -> {
                         startOffsetUpdater()
                     }
                 }
             }
-        }
-
-        //Set initial offset
-        drawerLayout.post {
-            mAdapter.updateOffset(drawerLayout.drawerOffset)
+            //Set initial offset
+            doOnLayout {
+                mAdapter.updateOffset(drawerLayout.drawerOffset)
+            }
         }
     }
 

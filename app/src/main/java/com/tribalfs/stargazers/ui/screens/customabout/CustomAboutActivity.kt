@@ -29,7 +29,8 @@ import dev.oneuiproject.oneui.ktx.invokeOnBack
 import dev.oneuiproject.oneui.ktx.isInMultiWindowModeCompat
 import dev.oneuiproject.oneui.ktx.semSetToolTipText
 import dev.oneuiproject.oneui.utils.DeviceLayoutUtil.isPortrait
-import dev.oneuiproject.oneui.utils.internal.ToolbarLayoutUtils
+import dev.oneuiproject.oneui.utils.internal.ToolbarLayoutUtils.updateAdaptiveSideMargins
+import dev.oneuiproject.oneui.utils.internal.ToolbarLayoutUtils.updateStatusBarVisibility
 import dev.oneuiproject.oneui.widget.CardItemView
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.abs
@@ -135,11 +136,8 @@ class CustomAboutActivity : AppCompatActivity(){
 
     @SuppressLint("RestrictedApi")
     private fun refreshAppBar(config: Configuration) {
-        ToolbarLayoutUtils.hideStatusBarForLandscape(this, config.orientation)
-        ToolbarLayoutUtils.updateListBothSideMargin(
-            this,
-            mBinding.aboutBottomContainer
-        )
+        this.updateStatusBarVisibility()
+        mBinding.aboutBottomContainer.updateAdaptiveSideMargins()
         if (config.orientation != Configuration.ORIENTATION_LANDSCAPE
             && !isInMultiWindowModeCompat
         ) {

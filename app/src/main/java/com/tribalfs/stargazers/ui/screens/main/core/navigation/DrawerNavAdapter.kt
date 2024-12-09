@@ -151,8 +151,10 @@ class DrawerNavAdapter(
                     }
                 }
             }else{
-                itemView.updateLayoutParams<MarginLayoutParams> {
-                    width = MATCH_PARENT
+                if (itemView.width != MATCH_PARENT) {
+                    itemView.updateLayoutParams<MarginLayoutParams> {
+                        width = MATCH_PARENT
+                    }
                 }
             }
         }
@@ -168,8 +170,10 @@ class DrawerNavAdapter(
                     }
                 }
             }else{
-                itemView.updateLayoutParams<MarginLayoutParams> {
-                    width = MATCH_PARENT
+                if (itemView.width != MATCH_PARENT) {
+                    itemView.updateLayoutParams<MarginLayoutParams> {
+                        width = MATCH_PARENT
+                    }
                 }
             }
         }

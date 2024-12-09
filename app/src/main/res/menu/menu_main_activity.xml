@@ -5,10 +5,10 @@
     tools:ignore="AppCompatResource">
 
     <item
-        android:id="@+id/menu_settings"
-        android:title="Settings"
-        app:showAsAction="always"
-        android:icon="@drawable/ic_oui_settings_outline"
+        android:id="@+id/menu_app_info"
+        android:title="App info"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_oui_info_outline"
         app:iconTint="?actionMenuTextColor"
         />
 

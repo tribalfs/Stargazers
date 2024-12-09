@@ -36,8 +36,6 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mBinding: ActivityMainBinding
     private lateinit var navController: NavController
 
-    private var settingsMenuItem: MenuItem? = null
-
     private lateinit var mainViewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +50,7 @@ class MainActivity : AppCompatActivity(),
 
         launchAndRepeatWithLifecycle(Lifecycle.State.RESUMED){
             mainViewModel.updateAvailableStateFlow.collectLatest {
-                settingsMenuItem?.setBadge(if (it) Badge.DOT else Badge.NONE)
+                mBinding.drawerLayout.setHeaderButtonBadge(if (it) Badge.DOT else Badge.NONE)
             }
         }
 
@@ -65,11 +63,17 @@ class MainActivity : AppCompatActivity(),
         mBinding.drawerLayout.apply {
             setHeaderButtonIcon(
                 ResourcesCompat.getDrawable(resources,
-                dev.oneuiproject.oneui.R.drawable.ic_oui_info_outline, theme)
+                dev.oneuiproject.oneui.R.drawable.ic_oui_settings_outline, theme)
             )
-            setHeaderButtonTooltip("App info")
+            setHeaderButtonTooltip("Stargazers Settings")
             setHeaderButtonOnClickListener {
-                startActivity(Intent(this@MainActivity, CustomAboutActivity::class.java))
+                ActivityUtils.startPopOverActivity(
+                    this@MainActivity,
+                    Intent(this@MainActivity, SettingsActivity::class.java),
+                    null,
+                    ActivityUtils.POP_OVER_POSITION_TOP or
+                            (if (isRTL) ActivityUtils.POP_OVER_POSITION_RIGHT else ActivityUtils.POP_OVER_POSITION_LEFT)
+                )
             }
             setNavRailContentMinSideMargin(14)
         }
@@ -89,19 +93,12 @@ class MainActivity : AppCompatActivity(),
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_main_activity, menu)
-        settingsMenuItem = menu.findItem(R.id.menu_settings)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_settings) {
-            ActivityUtils.startPopOverActivity(
-                this,
-                Intent(this, SettingsActivity::class.java),
-                null,
-                ActivityUtils.POP_OVER_POSITION_TOP or
-                        (if (!isRTL) ActivityUtils.POP_OVER_POSITION_RIGHT else ActivityUtils.POP_OVER_POSITION_LEFT)
-            )
+        if (item.itemId == R.id.menu_app_info) {
+            startActivity(Intent(this@MainActivity, CustomAboutActivity::class.java))
             return true
         }
         return false
