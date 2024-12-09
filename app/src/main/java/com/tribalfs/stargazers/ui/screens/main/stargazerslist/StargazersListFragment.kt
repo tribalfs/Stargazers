@@ -97,18 +97,28 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
                 stargazersViewModel.setRepoFilter(it)
             }
         }else{
-            if (savedInstanceState.getBoolean(KEY_IS_ACTION_MODE)) {
-                val selectedIds = savedInstanceState.getLongArray(KEY_ACTION_MODE_SELECTED_IDS)!!
-                launchActionMode(selectedIds.toTypedArray())
+            savedInstanceState.apply {
+                if (getBoolean(KEY_IS_ACTION_MODE)) {
+                    val selectedIds = savedInstanceState.getLongArray(KEY_ACTION_MODE_SELECTED_IDS)!!
+                    launchActionMode(selectedIds.toTypedArray())
+                }
+                if (getBoolean(KEY_IS_SEARCH_MODE)){
+                    mDrawerLayout!!.launchSearchMode(stargazersViewModel.getSearchModeOnBackBehavior())
+                }
             }
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        if (mDrawerLayout?.isActionMode == true) {
-            outState.putBoolean(KEY_IS_ACTION_MODE, true)
-            outState.putLongArray(KEY_ACTION_MODE_SELECTED_IDS,
-                stargazersAdapter.getSelectedIds().asSet().toLongArray())
+        mDrawerLayout?.apply {
+            if (isActionMode) {
+                outState.putBoolean(KEY_IS_ACTION_MODE, true)
+                outState.putLongArray(KEY_ACTION_MODE_SELECTED_IDS,
+                    stargazersAdapter.getSelectedIds().asSet().toLongArray())
+            }
+            if (isSearchMode) {
+                outState.putBoolean(KEY_IS_SEARCH_MODE, true)
+            }
         }
         super.onSaveInstanceState(outState)
     }
@@ -493,5 +503,6 @@ class StargazersListFragment : AbsBaseFragment(), ViewYTranslator by AppBarAware
         const val SWITCH_TO_HPB_DELAY = 1_500L
         private const val KEY_IS_ACTION_MODE = "isActionMode"
         private const val KEY_ACTION_MODE_SELECTED_IDS = "selectedIds"
+        private const val KEY_IS_SEARCH_MODE = "isSearchMode"
     }
 }
