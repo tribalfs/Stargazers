@@ -60,7 +60,7 @@ dependencies {
     implementation("sesl.androidx.core:core:1.15.0+1.0.11-sesl6+rev0")
     implementation("sesl.androidx.core:core-ktx:1.15.0+1.0.0-sesl6+rev0")
     implementation("sesl.androidx.fragment:fragment:1.8.4+1.0.0-sesl6+rev1")
-    implementation("sesl.androidx.appcompat:appcompat:1.7.0+1.0.34-sesl6+rev6")
+    implementation("sesl.androidx.appcompat:appcompat:1.7.0+1.0.34-sesl6+rev7")
     implementation("sesl.androidx.picker:picker-basic:1.0.17+1.0.17-sesl6+rev2")
     implementation("sesl.androidx.picker:picker-color:1.0.6+1.0.6-sesl6+rev3")
     implementation("sesl.androidx.preference:preference:1.2.1+1.0.4-sesl6+rev3")
@@ -72,7 +72,7 @@ dependencies {
     implementation("sesl.com.google.android.material:material:1.12.0+1.0.23-sesl6+rev2")
 
     //design lib
-    implementation("io.github.tribalfs:oneui-design:0.3.0+oneui6")
+    implementation("io.github.tribalfs:oneui-design:0.3.1+oneui6")
 
     //These are still OneUI4/5 icons.
     //Hopefully someone will update this.
