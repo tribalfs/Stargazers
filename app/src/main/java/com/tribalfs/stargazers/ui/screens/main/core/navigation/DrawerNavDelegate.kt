@@ -119,6 +119,8 @@ class MainNavigationDelegate: AppNavigation {
 
     private var offsetUpdaterJob: Job? = null
     private fun startOffsetUpdater(){
+        //Ensure no duplicate job is running
+        if (offsetUpdaterJob?.isActive == true) return
         offsetUpdaterJob = CoroutineScope(Dispatchers.Main).launch {
             while(isActive) {
                 mAdapter.updateOffset(drawerLayout.drawerOffset)
