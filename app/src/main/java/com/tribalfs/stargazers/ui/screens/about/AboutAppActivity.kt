@@ -1,8 +1,6 @@
 package com.tribalfs.stargazers.ui.screens.about
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -10,7 +8,6 @@ import com.tribalfs.stargazers.BuildConfig
 import com.tribalfs.stargazers.R
 import com.tribalfs.stargazers.data.StargazersRepo
 import com.tribalfs.stargazers.ui.core.util.isOnline
-import com.tribalfs.stargazers.ui.core.util.openApplicationSettings
 import com.tribalfs.stargazers.ui.core.util.openUrl
 import dev.oneuiproject.oneui.layout.AppInfoLayout
 import dev.oneuiproject.oneui.layout.AppInfoLayout.Status
@@ -51,19 +48,6 @@ class AboutAppActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_about_app, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_app_info) {
-            this.openApplicationSettings()
-            return true
-        }
-        return false
     }
 
     fun openGitHubPage(v: View?) {
