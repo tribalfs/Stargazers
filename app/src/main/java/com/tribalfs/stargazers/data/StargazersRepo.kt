@@ -22,11 +22,11 @@ import com.tribalfs.stargazers.data.network.NetworkDataSource
 import com.tribalfs.stargazers.data.network.Update
 import com.tribalfs.stargazers.data.network.UpdateDataSource
 import com.tribalfs.stargazers.data.util.determineDarkMode
-import com.tribalfs.stargazers.data.util.toFetchStatus
 import com.tribalfs.stargazers.data.util.getEffectiveHighlightColor
+import com.tribalfs.stargazers.data.util.toFetchStatus
 import com.tribalfs.stargazers.data.util.toSearchModeOnActionMode
 import com.tribalfs.stargazers.data.util.toSearchModeOnBackBehavior
-import dev.oneuiproject.oneui.layout.AppInfoLayout.UPDATE_AVAILABLE
+import dev.oneuiproject.oneui.layout.AppInfoLayout.Status
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -148,7 +148,7 @@ class StargazersRepo private constructor(
     fun setInitTupShown() = prefDataStoreImpl.putBoolean(PREF_INIT_TIP_SHOWN.name, true)
 
     suspend fun getUpdate(): Update = UpdateDataSource.getUpdate().also {
-        prefDataStoreImpl.putBoolean(PREF_UPDATE_AVAILABLE.name, it.status == UPDATE_AVAILABLE)
+        prefDataStoreImpl.putBoolean(PREF_UPDATE_AVAILABLE.name, it.status == Status.UpdateAvailable)
     }
 
     suspend fun getStargazersById(ids: IntArray) = database.stargazerDao().getStargazersById(ids)
@@ -177,7 +177,7 @@ class StargazersRepo private constructor(
         val PREF_DARK_MODE = stringPreferencesKey("darkMode")
         val PREF_AUTO_DARK_MODE = booleanPreferencesKey("darkModeAuto")
         val PREF_LAST_REFRESH = longPreferencesKey("lastRefresh")
-        val PREF_UPDATE_AVAILABLE = booleanPreferencesKey("updateAvailable")
+        val PREF_UPDATE_AVAILABLE = booleanPreferencesKey("updateAvailable1")
         private val PREF_INIT_TIP_SHOWN = booleanPreferencesKey("initTipShown")
         private val PREF_INIT_FETCH_STATE = intPreferencesKey("initFetch")
         private val PREF_LOCK_DRAWER_NAV_RAIL_ACTION_MODE = booleanPreferencesKey("lockDrawerNavRailActionMode")

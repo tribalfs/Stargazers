@@ -1,6 +1,7 @@
 package com.tribalfs.stargazers.ui.screens.main.core.navigation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.navigation.NavController
@@ -92,8 +93,9 @@ class MainNavigationDelegate: AppNavigation {
 
     private fun setupNavRailFadeEffect(){
         drawerLayout.apply {
-            if (!isLargeScreenMode) return
+           // if (!isLargeScreenMode) return
             setDrawerStateListener {
+                Log.d("DrawerNavDelegate", "DrawerState: $it")
                 when(it){
                     DrawerState.OPEN -> {
                         offsetUpdaterJob?.cancel()

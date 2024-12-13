@@ -19,7 +19,7 @@ import com.tribalfs.stargazers.ui.screens.main.core.navigation.DrawerItem.Compan
 import dev.oneuiproject.oneui.ktx.dpToPx
 import dev.oneuiproject.oneui.ktx.semSetToolTipText
 import dev.oneuiproject.oneui.utils.getBoldFont
-import dev.oneuiproject.oneui.utils.getNormalFont
+import dev.oneuiproject.oneui.utils.getRegularFont
 
 
 class DrawerNavAdapter(
@@ -136,7 +136,7 @@ class DrawerNavAdapter(
 
         fun setSelected(selected: Boolean) {
             itemView.isSelected = selected
-            mTitleView!!.typeface = if (selected) getBoldFont() else getNormalFont()
+            mTitleView!!.typeface = if (selected) getBoldFont() else getRegularFont()
             mTitleView!!.ellipsize =
                 if (selected) TextUtils.TruncateAt.MARQUEE else TextUtils.TruncateAt.END
 

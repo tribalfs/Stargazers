@@ -13,6 +13,7 @@ import com.tribalfs.stargazers.ui.core.util.isOnline
 import com.tribalfs.stargazers.ui.core.util.openApplicationSettings
 import com.tribalfs.stargazers.ui.core.util.openUrl
 import dev.oneuiproject.oneui.layout.AppInfoLayout
+import dev.oneuiproject.oneui.layout.AppInfoLayout.Status
 import kotlinx.coroutines.launch
 
 class AboutAppActivity : AppCompatActivity() {
@@ -39,14 +40,14 @@ class AboutAppActivity : AppCompatActivity() {
     }
 
     private fun fetchLatestRelease() {
-        appInfoLayout.status = AppInfoLayout.LOADING
+        appInfoLayout.updateStatus = Status.Loading
 
         if (!isOnline(applicationContext)) {
-            appInfoLayout.status = AppInfoLayout.NO_CONNECTION
+            appInfoLayout.updateStatus = Status.NoConnection
         } else {
             lifecycleScope.launch {
                 StargazersRepo.getInstance(applicationContext).getUpdate().status.let {
-                    appInfoLayout.status = it
+                    appInfoLayout.updateStatus = it
                 }
             }
         }
