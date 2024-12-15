@@ -72,7 +72,7 @@ dependencies {
     implementation("sesl.com.google.android.material:material:1.12.0+1.0.23-sesl6+rev2")
 
     //design lib
-    implementation("io.github.tribalfs:oneui-design:0.3.3+oneui6")
+    implementation("io.github.tribalfs:oneui-design:0.3.4+oneui6")
 
     //These are still OneUI4/5 icons.
     //Hopefully someone will update this.
@@ -94,8 +94,8 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.4")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.4")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.5")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.5")
 }
 
 configurations.implementation {

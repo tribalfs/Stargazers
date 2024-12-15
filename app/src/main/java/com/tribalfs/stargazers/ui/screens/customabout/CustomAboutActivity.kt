@@ -28,9 +28,9 @@ import com.tribalfs.stargazers.ui.screens.customabout.CustomAboutActivity.Conten
 import dev.oneuiproject.oneui.ktx.invokeOnBack
 import dev.oneuiproject.oneui.ktx.isInMultiWindowModeCompat
 import dev.oneuiproject.oneui.ktx.semSetToolTipText
+import dev.oneuiproject.oneui.layout.internal.util.ToolbarLayoutUtils.updateAdaptiveSideMargins
+import dev.oneuiproject.oneui.layout.internal.util.ToolbarLayoutUtils.updateStatusBarVisibility
 import dev.oneuiproject.oneui.utils.DeviceLayoutUtil.isPortrait
-import dev.oneuiproject.oneui.utils.internal.ToolbarLayoutUtils.updateAdaptiveSideMargins
-import dev.oneuiproject.oneui.utils.internal.ToolbarLayoutUtils.updateStatusBarVisibility
 import dev.oneuiproject.oneui.widget.CardItemView
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.abs
