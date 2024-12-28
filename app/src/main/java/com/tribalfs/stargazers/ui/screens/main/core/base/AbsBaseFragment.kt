@@ -18,16 +18,16 @@ abstract class AbsBaseFragment : Fragment() {
 
     private fun setupFragmentTransitions() {
         val interpolator = PathInterpolator(0.1f, 0.1f, 0f, 1f)
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true).apply {
             this.interpolator = interpolator
         }
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Y, false).apply {
             this.interpolator = interpolator
         }
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Y, false).apply {
             this.interpolator = interpolator
         }
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true).apply {
             this.interpolator = interpolator
         }
     }
