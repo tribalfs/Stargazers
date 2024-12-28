@@ -104,6 +104,13 @@ class MainActivity : AppCompatActivity(),
         return false
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.action == Intent.ACTION_SEARCH) {
+            mBinding.drawerLayout.setSearchQueryFromIntent(intent)
+        }
+    }
+
     private val isRTL: Boolean get() = resources.configuration.layoutDirection == LayoutDirection.RTL
 
     val drawerLayout: NavDrawerLayout get() = mBinding.drawerLayout
