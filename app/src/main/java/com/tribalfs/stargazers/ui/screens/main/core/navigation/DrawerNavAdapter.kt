@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tribalfs.stargazers.R
 import com.tribalfs.stargazers.ui.screens.main.core.navigation.DrawerItem.Companion.VIEW_TYPE
 import dev.oneuiproject.oneui.ktx.dpToPx
+import dev.oneuiproject.oneui.ktx.onSingleClick
 import dev.oneuiproject.oneui.ktx.semSetToolTipText
 import dev.oneuiproject.oneui.utils.getRegularFont
 import dev.oneuiproject.oneui.utils.getSemiBoldFont
@@ -84,7 +85,7 @@ class DrawerNavAdapter(
                     setIcon(destination.iconResId)
                     setTitle(destination.title)
                     setSelected(destination.id == mSelectedId)
-                    itemView.setOnClickListener {
+                    itemView.onSingleClick {
                         mListener.onDrawerItemSelected(destination.id)
                     }
                     itemView.semSetToolTipText(destination.title)

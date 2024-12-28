@@ -93,7 +93,6 @@ class MainNavigationDelegate: AppNavigation {
 
     private fun setupNavRailFadeEffect(){
         drawerLayout.apply {
-           // if (!isLargeScreenMode) return
             setDrawerStateListener {
                 Log.d("DrawerNavDelegate", "DrawerState: $it")
                 when(it){
