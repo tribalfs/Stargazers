@@ -41,6 +41,9 @@ class MainNavigationDelegate: AppNavigation {
             if (isLargeScreenMode){
                 closeNavRailOnBack = destination.id == controller.graph.startDestinationId
             }else{
+                // Ignore when the nav controller initially
+                // sets the home fragment
+                if (arguments == null) return
                 post { setDrawerOpen(false, animate = true) }
             }
         }
