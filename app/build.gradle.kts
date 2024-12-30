@@ -21,8 +21,8 @@ android {
         minSdk = 23
         targetSdk = 35
 
-        versionCode = 12
-        versionName = "0.1.4"
+        versionCode = 13
+        versionName = "0.1.5"
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -72,7 +72,7 @@ dependencies {
     implementation("sesl.com.google.android.material:material:1.12.0+1.0.23-sesl6+rev2")
 
     //design lib
-    implementation("io.github.tribalfs:oneui-design:0.3.6+oneui6")
+    implementation("io.github.tribalfs:oneui-design:0.3.7+oneui6")
 
     //These are still OneUI4/5 icons.
     //Hopefully someone will update this.
