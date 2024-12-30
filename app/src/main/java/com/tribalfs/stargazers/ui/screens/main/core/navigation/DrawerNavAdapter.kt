@@ -1,5 +1,8 @@
 package com.tribalfs.stargazers.ui.screens.main.core.navigation
 
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +15,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.FloatRange
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.tribalfs.stargazers.R
@@ -123,7 +127,10 @@ class DrawerNavAdapter(
         private var mTitleView: TextView? = null
 
         init {
-            mIconView = itemView.findViewById(R.id.drawer_item_icon)
+            mIconView = itemView.findViewById<AppCompatImageView?>(R.id.drawer_item_icon).apply {
+                imageTintList = getIconTint()
+                imageTintMode = PorterDuff.Mode.SRC_ATOP
+            }
             mTitleView = itemView.findViewById(R.id.drawer_item_title)
         }
 
@@ -158,6 +165,20 @@ class DrawerNavAdapter(
                     }
                 }
             }
+        }
+
+        private fun getIconTint(): ColorStateList{
+            val baseColor = Color.parseColor("#000000")
+
+            val states = arrayOf(
+                intArrayOf(android.R.attr.state_enabled),
+                intArrayOf(-android.R.attr.state_enabled)
+            )
+            val colors = intArrayOf(
+                ColorUtils.setAlphaComponent(baseColor, (255 * 0.0).toInt()),
+                ColorUtils.setAlphaComponent(baseColor, (255 * 0.5).toInt())
+            )
+            return ColorStateList(states, colors)
         }
     }
 
